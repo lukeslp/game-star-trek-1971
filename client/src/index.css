@@ -1,0 +1,333 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --primary: oklch(0.75 0.2 145);
+  --primary-foreground: oklch(0.1 0.02 220);
+  --sidebar-primary: oklch(0.7 0.2 145);
+  --sidebar-primary-foreground: oklch(0.1 0.02 220);
+  --chart-1: oklch(0.6 0.15 145);
+  --chart-2: oklch(0.65 0.18 145);
+  --chart-3: oklch(0.7 0.2 145);
+  --chart-4: oklch(0.75 0.22 145);
+  --chart-5: oklch(0.8 0.24 145);
+  --radius: 0.25rem;
+  --background: oklch(0.08 0.02 220);
+  --foreground: oklch(0.75 0.2 145);
+  --card: oklch(0.12 0.02 220);
+  --card-foreground: oklch(0.75 0.2 145);
+  --popover: oklch(0.1 0.02 220);
+  --popover-foreground: oklch(0.75 0.2 145);
+  --secondary: oklch(0.65 0.2 190);
+  --secondary-foreground: oklch(0.1 0.02 220);
+  --muted: oklch(0.2 0.02 220);
+  --muted-foreground: oklch(0.6 0.15 145);
+  --accent: oklch(0.75 0.2 60);
+  --accent-foreground: oklch(0.1 0.02 220);
+  --destructive: oklch(0.6 0.24 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0.1 145);
+  --input: oklch(0.25 0.08 145);
+  --ring: oklch(0.75 0.2 145);
+  --sidebar: oklch(0.12 0.02 220);
+  --sidebar-foreground: oklch(0.75 0.2 145);
+  --sidebar-accent: oklch(0.2 0.02 220);
+  --sidebar-accent-foreground: oklch(0.75 0.2 145);
+  --sidebar-border: oklch(0.3 0.1 145);
+  --sidebar-ring: oklch(0.75 0.2 145);
+}
+
+.dark {
+  --primary: oklch(0.75 0.2 145);
+  --primary-foreground: oklch(0.1 0.02 220);
+  --sidebar-primary: oklch(0.7 0.2 145);
+  --sidebar-primary-foreground: oklch(0.1 0.02 220);
+  --background: oklch(0.08 0.02 220);
+  --foreground: oklch(0.75 0.2 145);
+  --card: oklch(0.12 0.02 220);
+  --card-foreground: oklch(0.75 0.2 145);
+  --popover: oklch(0.1 0.02 220);
+  --popover-foreground: oklch(0.75 0.2 145);
+  --secondary: oklch(0.65 0.2 190);
+  --secondary-foreground: oklch(0.1 0.02 220);
+  --muted: oklch(0.2 0.02 220);
+  --muted-foreground: oklch(0.6 0.15 145);
+  --accent: oklch(0.75 0.2 60);
+  --accent-foreground: oklch(0.1 0.02 220);
+  --destructive: oklch(0.6 0.24 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0.1 145);
+  --input: oklch(0.25 0.08 145);
+  --ring: oklch(0.75 0.2 145);
+  --chart-1: oklch(0.6 0.15 145);
+  --chart-2: oklch(0.65 0.18 145);
+  --chart-3: oklch(0.7 0.2 145);
+  --chart-4: oklch(0.75 0.22 145);
+  --chart-5: oklch(0.8 0.24 145);
+  --sidebar: oklch(0.12 0.02 220);
+  --sidebar-foreground: oklch(0.75 0.2 145);
+  --sidebar-accent: oklch(0.2 0.02 220);
+  --sidebar-accent-foreground: oklch(0.75 0.2 145);
+  --sidebar-border: oklch(0.3 0.1 145);
+  --sidebar-ring: oklch(0.75 0.2 145);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+
+  /* Game-specific components */
+  .game-grid {
+    @apply grid gap-0 border border-primary/50;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    aspect-ratio: 1;
+  }
+
+  .game-cell {
+    @apply flex items-center justify-center border border-primary/20 text-center;
+    aspect-ratio: 1;
+    font-size: clamp(0.75rem, 2vw, 1.25rem);
+  }
+
+  .console-output {
+    @apply bg-black/50 border border-primary/50 p-4 font-mono text-base overflow-y-auto;
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.75 0.2 145) oklch(0.08 0.02 220);
+  }
+
+  .console-output::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .console-output::-webkit-scrollbar-track {
+    background: oklch(0.08 0.02 220);
+  }
+
+  .console-output::-webkit-scrollbar-thumb {
+    background: oklch(0.75 0.2 145);
+    border-radius: 4px;
+  }
+
+  .status-panel {
+    @apply bg-card border border-primary/50 p-3 rounded;
+  }
+
+  .status-item {
+    @apply flex justify-between items-center py-1 border-b border-primary/20 last:border-0;
+  }
+
+  .status-label {
+    @apply text-muted-foreground text-xs uppercase tracking-wider;
+  }
+
+  .status-value {
+    @apply text-foreground font-bold;
+  }
+
+  /* Popover styling */
+  .driver-popover {
+    @apply bg-card border-2 border-primary/70 rounded shadow-lg;
+    background: oklch(0.12 0.02 220) !important;
+    color: oklch(0.75 0.2 145) !important;
+    box-shadow: 0 0 20px oklch(0.75 0.2 145 / 0.5) !important;
+    z-index: 10001 !important;
+  }
+
+  .driver-popover-title {
+    @apply text-primary font-bold mb-2;
+    font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+    font-size: 1.5rem !important;
+    line-height: 1.4 !important;
+    text-shadow: 0 0 8px currentColor;
+  }
+
+  .driver-popover-description {
+    @apply text-foreground;
+    font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+    font-size: 1.125rem !important;
+    line-height: 1.7 !important;
+  }
+
+  .driver-popover-footer {
+    @apply mt-4 pt-3 border-t border-primary/30;
+  }
+
+  .driver-popover-progress-text {
+    @apply text-muted-foreground text-xs uppercase tracking-wider;
+  }
+
+  .driver-popover-next-btn,
+  .driver-popover-prev-btn,
+  .driver-popover-close-btn {
+    @apply bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 hover:border-primary;
+    font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+    text-transform: uppercase;
+    font-size: 1rem !important;
+    padding: 0.625rem 1.25rem !important;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+  }
+
+  .driver-popover-next-btn:hover,
+  .driver-popover-prev-btn:hover,
+  .driver-popover-close-btn:hover {
+    box-shadow: 0 0 10px oklch(0.75 0.2 145 / 0.4);
+  }
+}
+
+/* ============================================ */
+/* Tour (driver.js) CRITICAL OVERRIDES */
+/* These MUST be outside @layer to have maximum priority! */
+/* ============================================ */
+
+/* The dark overlay background - lighter so users can see more context */
+.driver-overlay {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(0.5px) !important;
+  z-index: 9998 !important;
+}
+
+/* The stage (cutout area) - just the outline, no background */
+.driver-stage {
+  background: none !important;
+  outline: 4px solid oklch(0.85 0.25 145) !important;
+  box-shadow: 0 0 40px 10px oklch(0.85 0.25 145),
+              0 0 80px 20px oklch(0.75 0.2 145 / 0.4) !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Pull the active element ABOVE the overlay so it's not dimmed */
+.driver-active-element {
+  position: relative !important;
+  z-index: 10000 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto !important;
+  isolation: isolate !important;
+}
+
+/* Ensure all children are fully visible and not filtered */
+.driver-active-element *,
+.driver-active-element *::before,
+.driver-active-element *::after {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Extra specificity to ensure z-index is applied */
+header.driver-active-element,
+div.driver-active-element,
+section.driver-active-element,
+form.driver-active-element,
+[data-tour].driver-active-element {
+  z-index: 10000 !important;
+  filter: none !important;
+}
+
+/* Make command panel tour step more prominent */
+[data-tour='command-panel'].driver-active-element {
+  transform: scale(1.02) !important;
+  box-shadow: 0 0 60px oklch(0.85 0.25 145 / 0.6) !important;
+}

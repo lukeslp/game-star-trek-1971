@@ -1,0 +1,365 @@
+/**
+ * Achievement System for Star Trek 1971
+ * Tracks player accomplishments across multiple games
+ */
+
+import type { GameState } from './types';
+import type { Difficulty } from './difficulty';
+
+export type AchievementId =
+  | 'first_command'
+  | 'speed_demon'
+  | 'diplomatic_solution'
+  | 'perfect_captain'
+  | 'klingon_hunter'
+  | 'admiral_victory'
+  | 'sharpshooter'
+  | 'shield_master'
+  | 'veteran_commander'
+  | 'legendary_captain';
+
+export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+export interface Achievement {
+  id: AchievementId;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: AchievementRarity;
+  secret?: boolean; // Hidden until unlocked
+  
+  // Unlock condition checker
+  checkUnlock: (state: GameState, stats: PlayerStats) => boolean;
+}
+
+export interface UnlockedAchievement {
+  id: AchievementId;
+  unlockedAt: string; // ISO timestamp
+  gameStardate: number;
+}
+
+export interface PlayerStats {
+  totalGames: number;
+  totalVictories: number;
+  totalKlingonsDestroyed: number;
+  fastestWin: number | null; // stardates
+  perfectGames: number; // no damage taken
+  gamesPerDifficulty: {
+    CADET: number;
+    CAPTAIN: number;
+    ADMIRAL: number;
+  };
+  consecutiveHits: number;
+  currentConsecutiveHits: number;
+}
+
+/**
+ * Achievement definitions
+ */
+export const ACHIEVEMENTS: Record<AchievementId, Achievement> = {
+  first_command: {
+    id: 'first_command',
+    name: 'First Command',
+    description: 'Complete your first mission successfully',
+    icon: '🎖️',
+    rarity: 'common',
+    checkUnlock: (state, stats) => state.victory && stats.totalVictories >= 1
+  },
+
+  speed_demon: {
+    id: 'speed_demon',
+    name: 'Speed Demon',
+    description: 'Complete a mission in under 15 stardates',
+    icon: '⚡',
+    rarity: 'rare',
+    checkUnlock: (state, stats) => {
+      if (!state.victory) return false;
+      const stardatesUsed = state.stardate - state.initialStardate;
+      return stardatesUsed < 15;
+    }
+  },
+
+  diplomatic_solution: {
+    id: 'diplomatic_solution',
+    name: 'Diplomatic Solution',
+    description: 'Win without firing phasers',
+    icon: '🕊️',
+    rarity: 'epic',
+    secret: true,
+    checkUnlock: (state, stats) => {
+      // This would need tracking of phaser usage in game state
+      // For now, this is a placeholder
+      return false; // TODO: Implement phaser usage tracking
+    }
+  },
+
+  perfect_captain: {
+    id: 'perfect_captain',
+    name: 'Perfect Captain',
+    description: 'Complete a mission without taking any damage',
+    icon: '🏆',
+    rarity: 'legendary',
+    checkUnlock: (state, stats) => {
+      if (!state.victory) return false;
+      return state.systems.every(s => s.damage === 0);
+    }
+  },
+
+  klingon_hunter: {
+    id: 'klingon_hunter',
+    name: 'Klingon Hunter',
+    description: 'Destroy 100 Klingons across all games',
+    icon: '💀',
+    rarity: 'rare',
+    checkUnlock: (state, stats) => stats.totalKlingonsDestroyed >= 100
+  },
+
+  admiral_victory: {
+    id: 'admiral_victory',
+    name: 'Admiral',
+    description: 'Complete a mission on Admiral difficulty',
+    icon: '⭐⭐⭐',
+    rarity: 'epic',
+    checkUnlock: (state, stats) => {
+      // This requires difficulty tracking in game state
+      // For now, check if player has won on Admiral
+      return stats.gamesPerDifficulty.ADMIRAL > 0 && state.victory;
+    }
+  },
+
+  sharpshooter: {
+    id: 'sharpshooter',
+    name: 'Sharpshooter',
+    description: 'Land 10 consecutive hits without missing',
+    icon: '🎯',
+    rarity: 'rare',
+    checkUnlock: (state, stats) => stats.consecutiveHits >= 10
+  },
+
+  shield_master: {
+    id: 'shield_master',
+    name: 'Shield Master',
+    description: 'Win with shields never dropping below 50%',
+    icon: '🛡️',
+    rarity: 'epic',
+    secret: true,
+    checkUnlock: (state, stats) => {
+      // This would require tracking minimum shield level throughout game
+      // Placeholder for now
+      return false; // TODO: Implement shield level tracking
+    }
+  },
+
+  veteran_commander: {
+    id: 'veteran_commander',
+    name: 'Veteran Commander',
+    description: 'Complete 10 successful missions',
+    icon: '🌟',
+    rarity: 'rare',
+    checkUnlock: (state, stats) => stats.totalVictories >= 10
+  },
+
+  legendary_captain: {
+    id: 'legendary_captain',
+    name: 'Legendary Captain',
+    description: 'Achieve S rank on Admiral difficulty',
+    icon: '👑',
+    rarity: 'legendary',
+    secret: true,
+    checkUnlock: (state, stats) => {
+      // This requires score and difficulty tracking
+      // Placeholder for now
+      return false; // TODO: Implement score/difficulty tracking
+    }
+  }
+};
+
+/**
+ * Get all achievements as array
+ */
+export function getAllAchievements(): Achievement[] {
+  return Object.values(ACHIEVEMENTS);
+}
+
+/**
+ * Load player stats from localStorage
+ */
+export function loadPlayerStats(): PlayerStats {
+  const stored = localStorage.getItem('startrek_player_stats');
+  if (!stored) {
+    return {
+      totalGames: 0,
+      totalVictories: 0,
+      totalKlingonsDestroyed: 0,
+      fastestWin: null,
+      perfectGames: 0,
+      gamesPerDifficulty: {
+        CADET: 0,
+        CAPTAIN: 0,
+        ADMIRAL: 0
+      },
+      consecutiveHits: 0,
+      currentConsecutiveHits: 0
+    };
+  }
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return {
+      totalGames: 0,
+      totalVictories: 0,
+      totalKlingonsDestroyed: 0,
+      fastestWin: null,
+      perfectGames: 0,
+      gamesPerDifficulty: {
+        CADET: 0,
+        CAPTAIN: 0,
+        ADMIRAL: 0
+      },
+      consecutiveHits: 0,
+      currentConsecutiveHits: 0
+    };
+  }
+}
+
+/**
+ * Save player stats to localStorage
+ */
+export function savePlayerStats(stats: PlayerStats): void {
+  localStorage.setItem('startrek_player_stats', JSON.stringify(stats));
+}
+
+/**
+ * Update player stats after a game
+ */
+export function updatePlayerStats(
+  state: GameState,
+  difficulty: Difficulty = 'CAPTAIN'
+): PlayerStats {
+  const stats = loadPlayerStats();
+
+  stats.totalGames++;
+
+  if (state.victory) {
+    stats.totalVictories++;
+    
+    const stardatesUsed = state.stardate - state.initialStardate;
+    if (stats.fastestWin === null || stardatesUsed < stats.fastestWin) {
+      stats.fastestWin = stardatesUsed;
+    }
+
+    if (state.systems.every(s => s.damage === 0)) {
+      stats.perfectGames++;
+    }
+
+    stats.gamesPerDifficulty[difficulty]++;
+  }
+
+  const klingonsKilled = state.mission.initialKlingons - state.galaxy.klingonsRemaining;
+  stats.totalKlingonsDestroyed += klingonsKilled;
+
+  savePlayerStats(stats);
+  return stats;
+}
+
+/**
+ * Load unlocked achievements from localStorage
+ */
+export function loadUnlockedAchievements(): UnlockedAchievement[] {
+  const stored = localStorage.getItem('startrek_achievements');
+  if (!stored) return [];
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Save unlocked achievements to localStorage
+ */
+export function saveUnlockedAchievements(unlocked: UnlockedAchievement[]): void {
+  localStorage.setItem('startrek_achievements', JSON.stringify(unlocked));
+}
+
+/**
+ * Check and unlock achievements after a game
+ * Returns newly unlocked achievements
+ */
+export function checkAchievements(state: GameState): Achievement[] {
+  const stats = loadPlayerStats();
+  const unlocked = loadUnlockedAchievements();
+  const unlockedIds = new Set(unlocked.map(a => a.id));
+  const newlyUnlocked: Achievement[] = [];
+
+  // Check each achievement
+  for (const achievement of getAllAchievements()) {
+    // Skip if already unlocked
+    if (unlockedIds.has(achievement.id)) continue;
+
+    // Check if condition is met
+    if (achievement.checkUnlock(state, stats)) {
+      newlyUnlocked.push(achievement);
+      
+      // Add to unlocked list
+      unlocked.push({
+        id: achievement.id,
+        unlockedAt: new Date().toISOString(),
+        gameStardate: state.stardate
+      });
+    }
+  }
+
+  // Save if any new achievements unlocked
+  if (newlyUnlocked.length > 0) {
+    saveUnlockedAchievements(unlocked);
+  }
+
+  return newlyUnlocked;
+}
+
+/**
+ * Check if an achievement is unlocked
+ */
+export function isAchievementUnlocked(achievementId: AchievementId): boolean {
+  const unlocked = loadUnlockedAchievements();
+  return unlocked.some(a => a.id === achievementId);
+}
+
+/**
+ * Get achievement completion percentage
+ */
+export function getCompletionPercentage(): number {
+  const total = getAllAchievements().length;
+  const unlocked = loadUnlockedAchievements().length;
+  return Math.floor((unlocked / total) * 100);
+}
+
+/**
+ * Get rarity color for CSS
+ */
+export function getRarityColor(rarity: AchievementRarity): string {
+  switch (rarity) {
+    case 'common':
+      return '#AAAAAA'; // Gray
+    case 'rare':
+      return '#4488FF'; // Blue
+    case 'epic':
+      return '#AA44FF'; // Purple
+    case 'legendary':
+      return '#FFD700'; // Gold
+    default:
+      return '#FFFFFF';
+  }
+}
+
+/**
+ * Reset all achievements (for testing)
+ */
+export function resetAchievements(): void {
+  localStorage.removeItem('startrek_achievements');
+  localStorage.removeItem('startrek_player_stats');
+}
+

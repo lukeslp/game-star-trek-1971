@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Trek 1971 // Glassomorphism</title>
+  <meta name="description" content="Star Trek 1971 - Glassomorphism HUD. Frosted glass, transparency, futuristic.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --neon-blue: #00d9ff;
+      --neon-purple: #a855f7;
+      --neon-pink: #ff00ff;
+      --text: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      font-family: 'Orbitron', 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated Background */
+    .space-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .space-background::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 217, 255, 0.15), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.15), transparent 40%),
+        radial-gradient(circle at 60% 80%, rgba(255, 0, 255, 0.1), transparent 40%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+      33% {
+        transform: translate(30px, -30px) rotate(120deg);
+      }
+      66% {
+        transform: translate(-20px, 20px) rotate(240deg);
+      }
+    }
+
+    /* Stars */
+    .stars {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      box-shadow: 
+        200px 300px white, 400px 100px white, 600px 500px white,
+        150px 450px white, 750px 250px white, 300px 600px white,
+        500px 50px white, 100px 550px white, 650px 400px white,
+        350px 200px white, 550px 450px white, 250px 350px white;
+      animation: twinkle 4s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Glass Panels */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Layout */
+    .container {
+      position: relative;
+      z-index: 1;
+      padding: 2rem;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Header HUD */
+    .hud-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .hud-stat {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .hud-stat .label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .hud-stat .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--neon-blue);
+      text-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    .hud-stat .value.danger {
+      color: #ff4466;
+      text-shadow: 0 0 10px #ff4466;
+    }
+
+    .hud-stat .value.warning {
+      color: #ffaa00;
+      text-shadow: 0 0 10px #ffaa00;
+    }
+
+    /* Main View */
+    .main-view {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      overflow: hidden;
+    }
+
+    .sector-view {
+      padding: 1.5rem;
+    }
+
+    .sector-view h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--neon-blue);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    .holographic-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      padding: 1rem;
+      background: rgba(0, 217, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+    }
+
+    .holo-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+    }
+
+    .holo-cell.enterprise {
+      background: rgba(0, 217, 255, 0.2);
+      border-color: var(--neon-blue);
+      color: var(--neon-blue);
+      text-shadow: 0 0 10px var(--neon-blue);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+    }
+
+    .holo-cell.klingon {
+      background: rgba(255, 68, 102, 0.2);
+      border-color: #ff4466;
+      color: #ff4466;
+      text-shadow: 0 0 10px #ff4466;
+      box-shadow: 0 0 20px rgba(255, 68, 102, 0.4);
+      animation: pulse-danger 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-danger {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .holo-cell.starbase {
+      background: rgba(106, 255, 193, 0.2);
+      border-color: #6affc1;
+      color: #6affc1;
+      text-shadow: 0 0 10px #6affc1;
+    }
+
+    .holo-cell.star {
+      color: var(--neon-purple);
+      text-shadow: 0 0 8px var(--neon-purple);
+    }
+
+    /* Terminal Glass */
+    .terminal-glass {
+      padding: 1.5rem;
+      overflow-y: auto;
+      max-height: 100%;
+    }
+
+    .terminal-glass::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .terminal-glass::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    .terminal-glass::-webkit-scrollbar-thumb {
+      background: rgba(0, 217, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    .term-line {
+      margin: 4px 0;
+      font-size: 0.9rem;
+    }
+
+    .term-line.cmd {
+      color: var(--neon-blue);
+      font-weight: 500;
+    }
+
+    .term-line.alert {
+      color: #ff4466;
+      font-weight: 700;
+      text-shadow: 0 0 5px #ff4466;
+    }
+
+    /* Input */
+    .glass-input {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .glass-input .prompt {
+      font-size: 1.25rem;
+      color: var(--neon-blue);
+      font-weight: 700;
+      text-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    .glass-input input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .glass-input input:focus {
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+
+    button {
+      background: rgba(0, 217, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--neon-blue);
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      color: var(--neon-blue);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: rgba(0, 217, 255, 0.25);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-view {
+        grid-template-columns: 1fr;
+      }
+
+      .sector-view {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="space-background">
+    <div class="stars"></div>
+  </div>
+
+  <div class="container">
+    <!-- HUD Header -->
+    <div class="hud-header">
+      <div class="glass hud-stat">
+        <div class="label">Stardate</div>
+        <div class="value" id="stardate">2200.0</div>
+      </div>
+      <div class="glass hud-stat">
+        <div class="label">Energy</div>
+        <div class="value" id="energy">3000</div>
+      </div>
+      <div class="glass hud-stat">
+        <div class="label">Shields</div>
+        <div class="value warning" id="shields">0</div>
+      </div>
+      <div class="glass hud-stat">
+        <div class="label">Torpedoes</div>
+        <div class="value" id="torpedoes">10</div>
+      </div>
+      <div class="glass hud-stat">
+        <div class="label">Klingons</div>
+        <div class="value danger" id="klingons">12</div>
+      </div>
+      <div class="glass hud-stat">
+        <div class="label">Position</div>
+        <div class="value" id="position" style="font-size: 1.1rem;">Q0,0 S4,4</div>
+      </div>
+    </div>
+
+    <!-- Main View -->
+    <div class="main-view">
+      <!-- Holographic Sector -->
+      <div class="glass-strong sector-view">
+        <h2>◈ SENSOR ARRAY</h2>
+        <div class="holographic-grid" id="sectorGrid">
+          <!-- Populated by JS -->
+        </div>
+        <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-dim); text-align: center;">
+          E=ENTERPRISE K=KLINGON B=BASE *=STAR
+        </div>
+      </div>
+
+      <!-- Terminal Display -->
+      <div class="glass-strong">
+        <div class="terminal-glass" id="terminal">
+          <div class="term-line alert">═══════════════════════════════════</div>
+          <div class="term-line alert">  STAR TREK // STARDATE 2200.0</div>
+          <div class="term-line alert">═══════════════════════════════════</div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line">MISSION: Eliminate all Klingon vessels</div>
+          <div class="term-line">TIME LIMIT: 30 stardates</div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line">Intelligence: 12 hostiles detected</div>
+          <div class="term-line">Starbases: 2 available</div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line" style="color: var(--text-dim);">▸ Type HELP for commands</div>
+        </div>
+
+        <!-- Input -->
+        <div class="glass-input">
+          <span class="prompt">▸</span>
+          <input type="text" 
+                 id="commandInput" 
+                 placeholder="ENTER COMMAND..." 
+                 autocomplete="off"
+                 spellcheck="false"
+                 autofocus>
+          <button onclick="ui.submit()">EXECUTE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ui = {
+      terminal: document.getElementById('terminal'),
+      
+      init() {
+        this.renderGrid();
+        this.setupInput();
+      },
+      
+      renderGrid() {
+        const grid = document.getElementById('sectorGrid');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'holo-cell';
+            cell.textContent = '·';
+            
+            // Demo: Enterprise in center
+            if (x === 4 && y === 4) {
+              cell.className = 'holo-cell enterprise';
+              cell.textContent = 'E';
+            }
+            
+            grid.appendChild(cell);
+          }
+        }
+      },
+      
+      setupInput() {
+        document.getElementById('commandInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.submit();
+          }
+        });
+      },
+      
+      submit() {
+        const input = document.getElementById('commandInput');
+        const cmd = input.value.trim().toUpperCase();
+        if (cmd) {
+          this.addLine(`▸ ${cmd}`, 'cmd');
+          this.process(cmd);
+          input.value = '';
+        }
+      },
+      
+      process(cmd) {
+        if (cmd === 'HELP') {
+          this.addLine('═══════════════════════════════════', 'alert');
+          this.addLine('AVAILABLE SYSTEMS:', 'alert');
+          this.addLine('═══════════════════════════════════', 'alert');
+          this.addLine('NAV [course] [warp] - Navigation');
+          this.addLine('PHA [energy] - Phaser array');
+          this.addLine('TOR [course] - Photon torpedoes');
+          this.addLine('SHE [amount] - Shield control');
+          this.addLine('SRS - Short range scan');
+          this.addLine('LRS - Long range scan');
+          this.addLine('DAM - Damage report');
+          this.addLine('COM - Computer systems');
+        } else if (cmd === 'SRS') {
+          this.addLine('▸ Sensor array online', 'cmd');
+          this.addLine('Holographic display updated');
+        } else {
+          this.addLine('◆ Command acknowledged');
+          this.addLine('(Full game logic integration pending)');
+        }
+      },
+      
+      addLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `term-line ${className}`;
+        line.textContent = text;
+        this.terminal.appendChild(line);
+        this.terminal.scrollTop = this.terminal.scrollHeight;
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => ui.init());
+  </script>
+</body>
+</html>
+

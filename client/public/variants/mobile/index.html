@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Star Trek 1971 // Mobile</title>
+  <meta name="description" content="Star Trek 1971 - Mobile-First Card Interface. Swipe, tap, optimized for thumbs.">
+  <meta name="theme-color" content="#1a1f2e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg: #0f1419;
+      --card-bg: #1a1f2e;
+      --accent: #4a9eff;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --text: #e8edf4;
+      --text-muted: #8b95a5;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background: var(--card-bg);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-bar h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .stat-chips {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      background: var(--bg);
+      padding: 0.4rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .chip.danger { color: var(--danger); }
+    .chip.success { color: var(--success); }
+    .chip.accent { color: var(--accent); }
+
+    /* Card Stack */
+    .card-stack {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-bottom: 100px; /* Space for bottom nav */
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      touch-action: pan-y;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Sector Grid Card */
+    .sector-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      margin-top: 1rem;
+    }
+
+    .grid-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      touch-action: manipulation;
+    }
+
+    .grid-cell.enterprise {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 0 16px rgba(74, 158, 255, 0.6);
+    }
+
+    .grid-cell.klingon {
+      background: var(--danger);
+      color: white;
+      box-shadow: 0 0 16px rgba(255, 71, 87, 0.6);
+    }
+
+    .grid-cell.starbase {
+      background: var(--success);
+      color: white;
+    }
+
+    .grid-cell.star {
+      color: #ffd93d;
+    }
+
+    /* Command Cards */
+    .command-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .cmd-button {
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 1.25rem;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .cmd-button:active {
+      transform: scale(0.95);
+      background: rgba(74, 158, 255, 0.1);
+    }
+
+    .cmd-button .icon {
+      font-size: 1.75rem;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      min-width: 70px;
+    }
+
+    .nav-btn .icon {
+      font-size: 1.5rem;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+    }
+
+    .nav-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* Modal/Sheet */
+    .sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-radius: 20px 20px 0 0;
+      padding: 1.5rem;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
+      z-index: 2000;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .sheet.active {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      margin: 0 auto 1.5rem;
+      opacity: 0.5;
+    }
+
+    .sheet h3 {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .sheet-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1999;
+      display: none;
+    }
+
+    .sheet-overlay.active {
+      display: block;
+    }
+
+    /* Input Group */
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .input-group input, .input-group select {
+      width: 100%;
+      background: var(--bg);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 1rem;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button.sheet-btn {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 1rem;
+    }
+
+    button.sheet-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <h1>STAR TREK</h1>
+      <div class="stat-chips">
+        <div class="chip danger" id="klingons">K: 12</div>
+        <div class="chip accent" id="energy">E: 3000</div>
+        <div class="chip success" id="shields">S: 0</div>
+      </div>
+    </div>
+
+    <!-- Main Content (Card Stack) -->
+    <div class="card-stack">
+      <!-- Sensor Card -->
+      <div class="card">
+        <h2>📡 Sensors</h2>
+        <div class="sector-grid" id="sectorGrid">
+          <!-- Populated by JS -->
+        </div>
+        <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+          Quadrant 0,0 • Sector 4,4
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h2>⚡ Quick Actions</h2>
+        <div class="command-grid">
+          <div class="cmd-button" onclick="ui.showSheet('nav')">
+            <span class="icon">🧭</span>
+            <span>Navigate</span>
+          </div>
+          <div class="cmd-button" onclick="ui.showSheet('weapons')">
+            <span class="icon">⚔️</span>
+            <span>Weapons</span>
+          </div>
+          <div class="cmd-button" onclick="ui.showSheet('shields')">
+            <span class="icon">🛡️</span>
+            <span>Shields</span>
+          </div>
+          <div class="cmd-button" onclick="ui.srs()">
+            <span class="icon">📊</span>
+            <span>Scan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="card">
+        <h2>📋 Status</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg); border-radius: 12px;">
+            <span style="color: var(--text-muted);">Stardate</span>
+            <strong id="stardate">2200.0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg); border-radius: 12px;">
+            <span style="color: var(--text-muted);">Torpedoes</span>
+            <strong id="torpedoes">10</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg); border-radius: 12px;">
+            <span style="color: var(--text-muted);">Time Remaining</span>
+            <strong>30.0 SD</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Log -->
+      <div class="card">
+        <h2>📝 Mission Log</h2>
+        <div id="messageLog" style="font-size: 0.9rem; color: var(--text-muted);">
+          <p>Mission briefing: Destroy all Klingon vessels.</p>
+          <p>Intelligence reports 12 hostiles in the galaxy.</p>
+          <p>Good luck, Captain.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active">
+        <span class="icon">🎮</span>
+        <span>Play</span>
+      </button>
+      <button class="nav-btn" onclick="ui.showSheet('systems')">
+        <span class="icon">⚙️</span>
+        <span>Systems</span>
+      </button>
+      <button class="nav-btn" onclick="ui.showSheet('map')">
+        <span class="icon">🗺️</span>
+        <span>Map</span>
+      </button>
+      <button class="nav-btn" onclick="ui.showSheet('help')">
+        <span class="icon">❓</span>
+        <span>Help</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Modal Sheets -->
+  <div class="sheet-overlay" id="overlay" onclick="ui.closeSheet()"></div>
+  
+  <!-- Navigation Sheet -->
+  <div class="sheet" id="navSheet">
+    <div class="sheet-handle"></div>
+    <h3>🧭 Navigation</h3>
+    <div class="input-group">
+      <label>Course Direction (1-8)</label>
+      <select id="navCourse">
+        <option value="1">1 - Southwest</option>
+        <option value="2">2 - South</option>
+        <option value="3">3 - Southeast</option>
+        <option value="4">4 - West</option>
+        <option value="6">6 - East</option>
+        <option value="7">7 - Northwest</option>
+        <option value="8">8 - North</option>
+        <option value="9">9 - Northeast</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Warp Factor (0.1 - 8.0)</label>
+      <input type="range" min="0.1" max="8" step="0.1" value="1" id="navWarp" oninput="ui.updateWarpDisplay()">
+      <div style="text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--accent); margin-top: 0.5rem;" id="warpDisplay">Warp 1.0</div>
+    </div>
+    <button class="sheet-btn" onclick="ui.navigate()">ENGAGE</button>
+  </div>
+
+  <!-- Weapons Sheet -->
+  <div class="sheet" id="weaponsSheet">
+    <div class="sheet-handle"></div>
+    <h3>⚔️ Weapons</h3>
+    <div class="input-group">
+      <label>Phaser Energy Amount</label>
+      <input type="range" min="0" max="3000" step="50" value="200" id="phaserEnergy" oninput="ui.updatePhaserDisplay()">
+      <div style="text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--danger); margin-top: 0.5rem;" id="phaserDisplay">200 units</div>
+    </div>
+    <button class="sheet-btn" onclick="ui.firePhasers()" style="background: var(--danger);">FIRE PHASERS</button>
+    
+    <div style="margin: 1.5rem 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
+    
+    <div class="input-group">
+      <label>Torpedo Course</label>
+      <select id="torpedoCourse">
+        <option value="1">1 - Southwest</option>
+        <option value="2">2 - South</option>
+        <option value="3">3 - Southeast</option>
+        <option value="4">4 - West</option>
+        <option value="6">6 - East</option>
+        <option value="7">7 - Northwest</option>
+        <option value="8">8 - North</option>
+        <option value="9">9 - Northeast</option>
+      </select>
+    </div>
+    <button class="sheet-btn" onclick="ui.fireTorpedo()" style="background: var(--danger);">LAUNCH TORPEDO</button>
+  </div>
+
+  <script>
+    const ui = {
+      activeSheet: null,
+      
+      init() {
+        this.renderGrid();
+      },
+      
+      renderGrid() {
+        const grid = document.getElementById('sectorGrid');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.textContent = '·';
+            
+            // Demo: Enterprise in center
+            if (x === 4 && y === 4) {
+              cell.className = 'grid-cell enterprise';
+              cell.textContent = 'E';
+            }
+            
+            grid.appendChild(cell);
+          }
+        }
+      },
+      
+      showSheet(id) {
+        const sheets = {
+          nav: 'navSheet',
+          weapons: 'weaponsSheet',
+          systems: 'navSheet', // Reuse for demo
+          map: 'navSheet',
+          help: 'navSheet'
+        };
+        
+        const sheetId = sheets[id] || id + 'Sheet';
+        const sheet = document.getElementById(sheetId);
+        const overlay = document.getElementById('overlay');
+        
+        if (sheet) {
+          sheet.classList.add('active');
+          overlay.classList.add('active');
+          this.activeSheet = sheet;
+        }
+      },
+      
+      closeSheet() {
+        if (this.activeSheet) {
+          this.activeSheet.classList.remove('active');
+          document.getElementById('overlay').classList.remove('active');
+          this.activeSheet = null;
+        }
+      },
+      
+      updateWarpDisplay() {
+        const warp = document.getElementById('navWarp').value;
+        document.getElementById('warpDisplay').textContent = `Warp ${parseFloat(warp).toFixed(1)}`;
+      },
+      
+      updatePhaserDisplay() {
+        const energy = document.getElementById('phaserEnergy').value;
+        document.getElementById('phaserDisplay').textContent = `${energy} units`;
+      },
+      
+      navigate() {
+        const course = document.getElementById('navCourse').value;
+        const warp = document.getElementById('navWarp').value;
+        this.log(`NAV ${course} ${warp} - Engaging warp drive...`);
+        this.closeSheet();
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+      },
+      
+      firePhasers() {
+        const energy = document.getElementById('phaserEnergy').value;
+        this.log(`PHA ${energy} - Phasers firing!`);
+        this.closeSheet();
+        
+        if (navigator.vibrate) {
+          navigator.vibrate([50, 100, 50]);
+        }
+      },
+      
+      fireTorpedo() {
+        const course = document.getElementById('torpedoCourse').value;
+        this.log(`TOR ${course} - Torpedo away!`);
+        this.closeSheet();
+        
+        if (navigator.vibrate) {
+          navigator.vibrate([100, 50, 150]);
+        }
+      },
+      
+      srs() {
+        this.log('SRS - Short range scan complete.');
+      },
+      
+      log(message) {
+        const log = document.getElementById('messageLog');
+        const p = document.createElement('p');
+        p.textContent = message;
+        p.style.color = 'var(--accent)';
+        p.style.marginTop = '0.5rem';
+        log.appendChild(p);
+        
+        // Keep only last 10 messages
+        while (log.children.length > 10) {
+          log.removeChild(log.firstChild);
+        }
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => ui.init());
+
+    // Swipe detection (basic)
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const diff = touchStartY - touchEndY;
+      
+      // Swipe up to close sheet
+      if (diff > 100 && ui.activeSheet) {
+        ui.closeSheet();
+      }
+    });
+  </script>
+</body>
+</html>
+

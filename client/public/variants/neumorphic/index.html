@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Trek 1971 // Neumorphic</title>
+  <meta name="description" content="Star Trek 1971 - Neumorphic Space Command. Soft, tactile, depth-based interface.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #e4e9f2;
+      --surface: #eef3fb;
+      --shadow-light: rgba(255, 255, 255, 0.9);
+      --shadow-dark: rgba(163, 177, 198, 0.6);
+      --text: #2c3e50;
+      --text-muted: #7f8c9f;
+      --accent: #5b8fff;
+      --success: #6bcf9b;
+      --danger: #ff6b6b;
+      --warning: #ffd93d;
+    }
+
+    body {
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .game-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Neumorphic Components */
+    .neomorph-raised {
+      background: var(--bg);
+      box-shadow: 
+        -12px -12px 24px var(--shadow-light),
+        12px 12px 24px var(--shadow-dark);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .neomorph-inset {
+      background: var(--bg);
+      box-shadow: 
+        inset -6px -6px 12px var(--shadow-light),
+        inset 6px 6px 12px var(--shadow-dark);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .neomorph-flat {
+      background: var(--surface);
+      box-shadow: 
+        -4px -4px 8px var(--shadow-light),
+        4px 4px 8px var(--shadow-dark);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    /* Header */
+    .game-header {
+      margin-bottom: 2rem;
+    }
+
+    .game-header h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .status-card {
+      text-align: center;
+    }
+
+    .status-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .status-card .value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .status-card .value.good { color: var(--success); }
+    .status-card .value.warning { color: var(--warning); }
+    .status-card .value.danger { color: var(--danger); }
+
+    /* Main Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 400px 1fr 350px;
+      gap: 2rem;
+    }
+
+    /* Sector Display */
+    .sector-display {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      padding: 1rem;
+    }
+
+    .sector-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .sector-cell {
+      background: var(--bg);
+      box-shadow: 
+        inset -2px -2px 4px var(--shadow-light),
+        inset 2px 2px 4px var(--shadow-dark);
+      border-radius: 8px;
+    }
+
+    .sector-cell.enterprise {
+      color: var(--accent);
+      box-shadow: 
+        -4px -4px 8px var(--shadow-light),
+        4px 4px 8px var(--shadow-dark),
+        0 0 20px rgba(91, 143, 255, 0.3);
+    }
+
+    .sector-cell.klingon {
+      color: var(--danger);
+      box-shadow: 
+        -4px -4px 8px var(--shadow-light),
+        4px 4px 8px var(--shadow-dark),
+        0 0 20px rgba(255, 107, 107, 0.3);
+    }
+
+    .sector-cell.starbase {
+      color: var(--success);
+      box-shadow: 
+        -4px -4px 8px var(--shadow-light),
+        4px 4px 8px var(--shadow-dark),
+        0 0 20px rgba(107, 207, 155, 0.3);
+    }
+
+    .sector-cell.star {
+      color: var(--warning);
+    }
+
+    /* Terminal */
+    .terminal {
+      min-height: 400px;
+      max-height: 600px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+
+    .terminal::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .terminal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .terminal::-webkit-scrollbar-thumb {
+      background: var(--shadow-dark);
+      border-radius: 4px;
+    }
+
+    .terminal-line {
+      padding: 0.25rem 0;
+    }
+
+    .terminal-line.command {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .terminal-line.alert {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    /* Commands Panel */
+    .command-card {
+      margin-bottom: 1rem;
+    }
+
+    .command-card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .command-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    input, select {
+      background: var(--bg);
+      box-shadow: 
+        inset -3px -3px 6px var(--shadow-light),
+        inset 3px 3px 6px var(--shadow-dark);
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Buttons */
+    button {
+      background: var(--bg);
+      box-shadow: 
+        -6px -6px 12px var(--shadow-light),
+        6px 6px 12px var(--shadow-dark);
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    button:hover {
+      box-shadow: 
+        -8px -8px 16px var(--shadow-light),
+        8px 8px 16px var(--shadow-dark);
+    }
+
+    button:active {
+      box-shadow: 
+        inset -3px -3px 6px var(--shadow-light),
+        inset 3px 3px 6px var(--shadow-dark);
+    }
+
+    button.primary {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    button.full-width {
+      width: 100%;
+    }
+
+    /* Command Input */
+    .command-input-section {
+      margin-top: 1.5rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .prompt {
+      font-size: 1.25rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .sector-display {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <!-- Header -->
+    <header class="game-header">
+      <h1>Star Trek 1971</h1>
+      
+      <!-- Status Cards -->
+      <div class="status-grid">
+        <div class="status-card neomorph-flat">
+          <div class="label">Stardate</div>
+          <div class="value" id="stardate">2200.0</div>
+        </div>
+        <div class="status-card neomorph-flat">
+          <div class="label">Energy</div>
+          <div class="value good" id="energy">3000</div>
+        </div>
+        <div class="status-card neomorph-flat">
+          <div class="label">Shields</div>
+          <div class="value" id="shields">0</div>
+        </div>
+        <div class="status-card neomorph-flat">
+          <div class="label">Torpedoes</div>
+          <div class="value" id="torpedoes">10</div>
+        </div>
+        <div class="status-card neomorph-flat">
+          <div class="label">Klingons</div>
+          <div class="value danger" id="klingons">12</div>
+        </div>
+        <div class="status-card neomorph-flat">
+          <div class="label">Position</div>
+          <div class="value" id="position" style="font-size: 1.25rem;">Q0,0 S4,4</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Sensor Panel -->
+      <aside class="neomorph-raised">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Short Range Sensors</h2>
+        <div class="sector-display neomorph-inset" id="sectorGrid">
+          <!-- 8x8 grid populated by JS -->
+        </div>
+      </aside>
+
+      <!-- Terminal -->
+      <main class="neomorph-raised">
+        <div class="terminal" id="terminal">
+          <div class="terminal-line alert">★ MISSION BRIEFING ★</div>
+          <div class="terminal-line">Destroy all Klingon vessels in the galaxy.</div>
+          <div class="terminal-line">Time limit: 30 stardates</div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line">Type commands below or use Quick Commands panel →</div>
+        </div>
+        
+        <div class="command-input-section">
+          <div class="input-wrapper">
+            <span class="prompt">&gt;</span>
+            <input type="text" id="commandInput" class="neomorph-inset" placeholder="Enter command..." autocomplete="off" style="flex: 1;">
+            <button onclick="ui.submitCommand()" class="primary">Execute</button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Commands Panel -->
+      <aside class="neomorph-raised">
+        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Quick Commands</h2>
+        
+        <div class="command-card neomorph-flat">
+          <h3>Navigation</h3>
+          <form class="command-form" onsubmit="ui.nav(event)">
+            <div class="form-row">
+              <div>
+                <label>Course (1-8)</label>
+                <input type="number" min="1" max="8" value="1" id="navCourse">
+              </div>
+              <div>
+                <label>Warp Factor</label>
+                <input type="number" min="0.1" max="8" step="0.1" value="1" id="navWarp">
+              </div>
+            </div>
+            <button type="submit" class="primary full-width">NAV</button>
+          </form>
+        </div>
+
+        <div class="command-card neomorph-flat">
+          <h3>Weapons</h3>
+          <div class="command-form">
+            <div>
+              <label>Phaser Energy</label>
+              <input type="number" min="0" max="3000" step="50" value="200" id="phaserEnergy">
+            </div>
+            <button onclick="ui.firePhasers()" class="primary full-width">FIRE PHASERS</button>
+            
+            <div style="margin-top: 0.75rem;">
+              <label>Torpedo Course</label>
+              <input type="number" min="1" max="8" value="1" id="torpedoCourse">
+            </div>
+            <button onclick="ui.fireTorpedo()" class="primary full-width">FIRE TORPEDO</button>
+          </div>
+        </div>
+
+        <div class="command-card neomorph-flat">
+          <h3>Systems</h3>
+          <div class="command-form">
+            <button onclick="ui.srs()" class="full-width">SRS Scan</button>
+            <button onclick="ui.lrs()" class="full-width">LRS Scan</button>
+            <button onclick="ui.damage()" class="full-width">Damage Report</button>
+            <button onclick="ui.help()" class="full-width">Help</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const ui = {
+      terminal: document.getElementById('terminal'),
+      
+      init() {
+        this.renderSectorGrid();
+        this.setupInput();
+      },
+      
+      renderSectorGrid() {
+        const grid = document.getElementById('sectorGrid');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'sector-cell';
+            cell.textContent = '·';
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            grid.appendChild(cell);
+          }
+        }
+        
+        // Set enterprise in center (demo)
+        const centerCell = grid.querySelector('[data-x="4"][data-y="4"]');
+        if (centerCell) {
+          centerCell.className = 'sector-cell enterprise';
+          centerCell.textContent = 'E';
+        }
+      },
+      
+      setupInput() {
+        const input = document.getElementById('commandInput');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.submitCommand();
+          }
+        });
+      },
+      
+      submitCommand() {
+        const input = document.getElementById('commandInput');
+        const cmd = input.value.trim().toUpperCase();
+        if (cmd) {
+          this.addLine(`> ${cmd}`, 'command');
+          this.processCommand(cmd);
+          input.value = '';
+        }
+      },
+      
+      processCommand(cmd) {
+        if (cmd === 'HELP') {
+          this.addLine('Commands: NAV, PHA, TOR, SHE, SRS, LRS, DAM, COM, HELP');
+        } else if (cmd === 'SRS') {
+          this.addLine('Short range sensors active. Grid updated.');
+        } else {
+          this.addLine('Command received. (Demo mode - full game logic pending)');
+        }
+      },
+      
+      addLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `terminal-line ${className}`;
+        line.textContent = text;
+        this.terminal.appendChild(line);
+        this.terminal.scrollTop = this.terminal.scrollHeight;
+      },
+      
+      nav(e) {
+        e.preventDefault();
+        const course = document.getElementById('navCourse').value;
+        const warp = document.getElementById('navWarp').value;
+        this.addLine(`> NAV ${course} ${warp}`, 'command');
+        this.addLine(`Navigating course ${course} at warp ${warp}...`);
+      },
+      
+      firePhasers() {
+        const energy = document.getElementById('phaserEnergy').value;
+        this.addLine(`> PHA ${energy}`, 'command');
+        this.addLine(`Phasers firing with ${energy} units...`, 'alert');
+      },
+      
+      fireTorpedo() {
+        const course = document.getElementById('torpedoCourse').value;
+        this.addLine(`> TOR ${course}`, 'command');
+        this.addLine(`Photon torpedo away!`, 'alert');
+      },
+      
+      srs() {
+        this.addLine('> SRS', 'command');
+        this.addLine('Short range scan complete. Check sensor panel.');
+      },
+      
+      lrs() {
+        this.addLine('> LRS', 'command');
+        this.addLine('Long range sensors scanning...');
+      },
+      
+      damage() {
+        this.addLine('> DAM', 'command');
+        this.addLine('All systems operational.');
+      },
+      
+      help() {
+        this.addLine('> HELP', 'command');
+        this.addLine('Use Quick Commands panel or type commands manually.');
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => ui.init());
+  </script>
+</body>
+</html>
+

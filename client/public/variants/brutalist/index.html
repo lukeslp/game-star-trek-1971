@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STAR TREK 1971 // BRUTALIST</title>
+  <meta name="description" content="Star Trek 1971 - Brutalist Terminal Variant. Pure ASCII, pure function.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #000000;
+      --fg: #ffffff;
+      --alert: #ff0000;
+      --dim: #666666;
+    }
+
+    body {
+      font-family: 'Courier New', 'Courier', monospace;
+      font-size: 14px;
+      line-height: 1.2;
+      background: var(--bg);
+      color: var(--fg);
+      overflow: hidden;
+    }
+
+    .terminal {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background: var(--fg);
+      color: var(--bg);
+      padding: 4px 8px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--fg);
+    }
+
+    .status-bar .stat {
+      margin-right: 16px;
+    }
+
+    /* Main Display */
+    .display {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      overflow: hidden;
+    }
+
+    /* Sector Grid */
+    .sector-panel {
+      border-right: 2px solid var(--fg);
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .sector-panel h2 {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .ascii-grid {
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      line-height: 1.2;
+      white-space: pre;
+      letter-spacing: 4px;
+    }
+
+    .grid-labels {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    /* Terminal Output */
+    .terminal-output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .terminal-output::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .terminal-output::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    .terminal-output::-webkit-scrollbar-thumb {
+      background: var(--fg);
+    }
+
+    .line {
+      margin: 2px 0;
+      white-space: pre-wrap;
+    }
+
+    .line.command {
+      color: var(--fg);
+      font-weight: bold;
+    }
+
+    .line.alert {
+      color: var(--alert);
+      font-weight: bold;
+    }
+
+    .line.dim {
+      color: var(--dim);
+    }
+
+    /* Command Input */
+    .command-input-area {
+      border-top: 2px solid var(--fg);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+    }
+
+    .prompt {
+      color: var(--fg);
+      font-weight: bold;
+    }
+
+    .command-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      caret-color: var(--fg);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: var(--fg);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Quick Reference */
+    .quick-ref {
+      padding: 16px;
+      border-top: 2px solid var(--dim);
+      font-size: 11px;
+      color: var(--dim);
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .quick-ref h3 {
+      font-size: 11px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .quick-ref .cmd {
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: 4px;
+    }
+
+    /* Scanline Effect */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 1px,
+        rgba(255, 255, 255, 0.03) 1px,
+        rgba(255, 255, 255, 0.03) 2px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Game Over */
+    .game-over {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .game-over.active {
+      display: flex;
+    }
+
+    .game-over-content {
+      border: 4px double var(--fg);
+      padding: 32px;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .game-over-content h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      letter-spacing: 4px;
+    }
+
+    .game-over-content.victory h2 {
+      color: var(--fg);
+    }
+
+    .game-over-content.defeat h2 {
+      color: var(--alert);
+    }
+
+    .game-over-content p {
+      margin: 12px 0;
+      line-height: 1.6;
+    }
+
+    button {
+      background: var(--bg);
+      color: var(--fg);
+      border: 2px solid var(--fg);
+      padding: 8px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    button:hover {
+      background: var(--fg);
+      color: var(--bg);
+    }
+
+    button:active {
+      transform: translate(2px, 2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .display {
+        grid-template-columns: 1fr;
+      }
+
+      .sector-panel {
+        display: none;
+      }
+
+      .ascii-grid {
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div>
+        <span class="stat">SD:<span id="stardate">2200.0</span></span>
+        <span class="stat">E:<span id="energy">3000</span></span>
+        <span class="stat">S:<span id="shields">0</span></span>
+        <span class="stat">T:<span id="torpedoes">10</span></span>
+        <span class="stat">K:<span id="klingons">12</span></span>
+      </div>
+      <div>
+        <span class="stat">Q:<span id="quadrant">0,0</span></span>
+        <span class="stat">SEC:<span id="sector">0,0</span></span>
+      </div>
+    </div>
+
+    <!-- Main Display -->
+    <div class="display">
+      <!-- Sector Grid (ASCII) -->
+      <div class="sector-panel">
+        <h2>SHORT RANGE SENSORS</h2>
+        <div class="ascii-grid" id="sectorGrid">
+          <!-- Populated by JS -->
+        </div>
+        <div class="grid-labels">
+          <div>E=ENTERPRISE K=KLINGON</div>
+          <div>B=STARBASE *=STAR .=EMPTY</div>
+        </div>
+      </div>
+
+      <!-- Terminal Output -->
+      <div class="terminal-output" id="output">
+        <div class="line alert">═══════════════════════════════════════════════</div>
+        <div class="line alert">     STAR TREK   //   STARDATE 2200.0</div>
+        <div class="line alert">═══════════════════════════════════════════════</div>
+        <div class="line">&nbsp;</div>
+        <div class="line">MISSION: Destroy all Klingon vessels in the galaxy.</div>
+        <div class="line">TIME LIMIT: 30 stardates</div>
+        <div class="line">&nbsp;</div>
+        <div class="line">Intelligence reports: 12 Klingon vessels detected.</div>
+        <div class="line">Starbases available: 2</div>
+        <div class="line">&nbsp;</div>
+        <div class="line dim">Type HELP for command list</div>
+        <div class="line">&nbsp;</div>
+      </div>
+    </div>
+
+    <!-- Command Input -->
+    <div class="command-input-area">
+      <span class="prompt">&gt;</span>
+      <input type="text" 
+             class="command-input" 
+             id="commandInput" 
+             autocomplete="off" 
+             spellcheck="false"
+             placeholder="ENTER COMMAND"
+             autofocus>
+    </div>
+
+    <!-- Quick Reference -->
+    <div class="quick-ref">
+      <h3>QUICK COMMANDS:</h3>
+      <span class="cmd">NAV [1-8] [0.1-8]</span>
+      <span class="cmd">PHA [energy]</span>
+      <span class="cmd">TOR [1-8]</span>
+      <span class="cmd">SHE [energy]</span>
+      <span class="cmd">SRS</span>
+      <span class="cmd">LRS</span>
+      <span class="cmd">DAM</span>
+      <span class="cmd">COM</span>
+      <span class="cmd">HELP</span>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="game-over" id="gameOver">
+    <div class="game-over-content">
+      <h2 id="gameOverTitle">GAME OVER</h2>
+      <div id="gameOverMessage"></div>
+      <button onclick="location.reload()">NEW GAME</button>
+      <button onclick="location.href='/games/startrek/variants/'">VARIANT SELECT</button>
+    </div>
+  </div>
+
+  <script src="../shared/game-core.js"></script>
+  <script>
+    // Brutalist UI Controller
+    const ui = {
+      output: document.getElementById('output'),
+      
+      init() {
+        this.renderSectorGrid();
+        this.setupInput();
+        this.updateStatus();
+      },
+      
+      renderSectorGrid() {
+        const grid = document.getElementById('sectorGrid');
+        let ascii = '  0 1 2 3 4 5 6 7\n';
+        ascii += '  ───────────────\n';
+        
+        for (let y = 0; y < 8; y++) {
+          ascii += y + '│';
+          for (let x = 0; x < 8; x++) {
+            // This will connect to actual game state
+            ascii += '. ';
+          }
+          ascii += '\n';
+        }
+        
+        grid.textContent = ascii;
+      },
+      
+      setupInput() {
+        const input = document.getElementById('commandInput');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            const command = input.value.trim().toUpperCase();
+            if (command) {
+              this.executeCommand(command);
+              input.value = '';
+            }
+          }
+        });
+      },
+      
+      executeCommand(cmd) {
+        this.addLine(`> ${cmd}`, 'command');
+        
+        // Parse and execute (will connect to game logic)
+        if (cmd === 'HELP') {
+          this.showHelp();
+        } else if (cmd === 'SRS') {
+          this.addLine('SHORT RANGE SENSORS:', 'alert');
+          this.renderSectorGrid();
+        } else {
+          this.addLine('Command not yet implemented in this variant.', 'dim');
+        }
+      },
+      
+      showHelp() {
+        const help = `
+AVAILABLE COMMANDS:
+
+NAV [course] [warp]  - Navigate to new position
+                       Course: 1-8 (compass directions)
+                       Warp: 0.1-8.0 (speed factor)
+
+PHA [energy]         - Fire phasers at all Klingons
+                       Energy: Amount to use (divided among targets)
+
+TOR [course]         - Fire photon torpedo
+                       Course: 1-8 (direction)
+
+SHE [energy]         - Transfer energy to/from shields
+                       Positive = add to shields
+                       Negative = return to ship energy
+
+SRS                  - Short range sensor scan
+                       Shows 8x8 sector grid
+
+LRS                  - Long range sensor scan
+                       Shows 3x3 quadrant area
+
+DAM                  - Damage report
+                       Lists system status
+
+COM [func]           - Library computer
+                       1 = Galactic record
+                       2 = Status report
+
+HELP                 - This message
+XXX                  - Resign mission
+        `.trim();
+        
+        help.split('\n').forEach(line => {
+          this.addLine(line, line.match(/^[A-Z]{3}/) ? '' : 'dim');
+        });
+      },
+      
+      addLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `line ${className}`;
+        line.textContent = text;
+        this.output.appendChild(line);
+        this.output.scrollTop = this.output.scrollHeight;
+      },
+      
+      updateStatus() {
+        // This will connect to actual game state
+        document.getElementById('stardate').textContent = '2200.0';
+        document.getElementById('energy').textContent = '3000';
+        document.getElementById('shields').textContent = '0';
+        document.getElementById('torpedoes').textContent = '10';
+        document.getElementById('klingons').textContent = '12';
+        document.getElementById('quadrant').textContent = '0,0';
+        document.getElementById('sector').textContent = '4,4';
+      }
+    };
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      ui.init();
+    });
+  </script>
+</body>
+</html>
+

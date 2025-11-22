@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Trek: The Next Generation // LCARS Interface</title>
+  <meta name="description" content="Star Trek tactical simulator with Next Generation LCARS interface styling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* LCARS Color Palette */
+      --lcars-orange: #ff9c00;
+      --lcars-tangerine: #ffcc66;
+      --lcars-blue: #9999ff;
+      --lcars-sky: #99ccff;
+      --lcars-purple: #cc99cc;
+      --lcars-red: #cc6666;
+      --lcars-peach: #ffcc99;
+      
+      --bg-primary: #000000;
+      --bg-panel: #111111;
+      --text: #ffcc99;
+      --text-bright: #ffffff;
+      --border: #ff9c00;
+    }
+
+    body {
+      font-family: 'Antonio', 'Arial Narrow', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.4;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .lcars-frame {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      position: relative;
+    }
+
+    /* Top Bar - LCARS Style */
+    .lcars-top-bar {
+      background: var(--bg-panel);
+      display: grid;
+      grid-template-columns: 80px 1fr 300px 80px;
+      gap: 8px;
+      padding: 8px;
+      height: 80px;
+    }
+
+    .lcars-cap {
+      background: var(--lcars-orange);
+      border-radius: 0 0 40px 40px;
+    }
+
+    .lcars-title {
+      background: var(--lcars-tangerine);
+      border-radius: 0 0 30px 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+      color: var(--bg-primary);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .lcars-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lcars-stat-bar {
+      background: var(--lcars-blue);
+      border-radius: 0 0 15px 15px;
+      padding: 0.5rem 1rem;
+      color: var(--bg-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .lcars-stat-bar.danger {
+      background: var(--lcars-red);
+    }
+
+    .lcars-stat-bar.warning {
+      background: var(--lcars-peach);
+    }
+
+    /* Main Content Area */
+    .lcars-main {
+      display: grid;
+      grid-template-columns: 400px 1fr 350px;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* Left Panel */
+    .lcars-left-panel {
+      background: var(--bg-panel);
+      display: flex;
+      flex-direction: column;
+      border-right: 4px solid var(--lcars-orange);
+    }
+
+    .panel-header {
+      background: var(--lcars-orange);
+      color: var(--bg-primary);
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 0 20px 0 0;
+    }
+
+    .sensor-grid-container {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .sensor-cell {
+      aspect-ratio: 1;
+      background: rgba(153, 153, 255, 0.15);
+      border: 2px solid var(--lcars-blue);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--lcars-blue);
+      transition: all 0.3s;
+    }
+
+    .sensor-cell.enterprise {
+      background: var(--lcars-orange);
+      border-color: var(--lcars-orange);
+      color: var(--bg-primary);
+      box-shadow: 0 0 20px var(--lcars-orange);
+      animation: pulse-enterprise 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-enterprise {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 30px var(--lcars-orange); }
+    }
+
+    .sensor-cell.klingon {
+      background: var(--lcars-red);
+      border-color: var(--lcars-red);
+      color: var(--text-bright);
+      box-shadow: 0 0 20px var(--lcars-red);
+      animation: pulse-klingon 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-klingon {
+      0%, 100% { box-shadow: 0 0 20px var(--lcars-red); }
+      50% { box-shadow: 0 0 35px var(--lcars-red); }
+    }
+
+    .sensor-cell.starbase {
+      background: var(--lcars-sky);
+      border-color: var(--lcars-sky);
+      color: var(--bg-primary);
+    }
+
+    .sensor-cell.star {
+      color: var(--lcars-tangerine);
+      border-color: var(--lcars-tangerine);
+    }
+
+    .sensor-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Center Panel - Terminal */
+    .lcars-center-panel {
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-output {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .terminal-output::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .terminal-output::-webkit-scrollbar-track {
+      background: var(--bg-panel);
+    }
+
+    .terminal-output::-webkit-scrollbar-thumb {
+      background: var(--lcars-orange);
+      border-radius: 6px;
+    }
+
+    .terminal-line {
+      margin: 0.5rem 0;
+    }
+
+    .terminal-line.command {
+      color: var(--lcars-tangerine);
+      font-weight: 600;
+    }
+
+    .terminal-line.alert {
+      color: var(--lcars-red);
+      font-weight: 700;
+    }
+
+    .terminal-line.success {
+      color: var(--lcars-sky);
+    }
+
+    .terminal-input-area {
+      background: var(--bg-panel);
+      border-top: 4px solid var(--lcars-orange);
+      padding: 1.5rem 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .prompt {
+      color: var(--lcars-orange);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .lcars-input {
+      flex: 1;
+      background: rgba(255, 156, 0, 0.1);
+      border: 2px solid var(--lcars-orange);
+      border-radius: 20px;
+      padding: 1rem 1.5rem;
+      color: var(--text-bright);
+      font-family: inherit;
+      font-size: 1.1rem;
+      outline: none;
+    }
+
+    .lcars-input:focus {
+      background: rgba(255, 156, 0, 0.2);
+      box-shadow: 0 0 20px rgba(255, 156, 0, 0.4);
+    }
+
+    /* Right Panel - Commands */
+    .lcars-right-panel {
+      background: var(--bg-panel);
+      border-left: 4px solid var(--lcars-purple);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .command-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .command-section h3 {
+      color: var(--lcars-purple);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--lcars-purple);
+    }
+
+    .lcars-button {
+      width: 100%;
+      background: var(--lcars-orange);
+      border: none;
+      border-radius: 25px;
+      padding: 1rem 1.5rem;
+      color: var(--bg-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lcars-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 25px 0 0 25px;
+    }
+
+    .lcars-button:hover {
+      transform: translateX(4px);
+      box-shadow: -4px 0 12px rgba(255, 156, 0, 0.4);
+    }
+
+    .lcars-button:active {
+      transform: translateX(2px);
+    }
+
+    .lcars-button.primary {
+      background: var(--lcars-blue);
+      color: var(--bg-primary);
+    }
+
+    .lcars-button.danger {
+      background: var(--lcars-red);
+      color: var(--text-bright);
+    }
+
+    .lcars-button.secondary {
+      background: var(--lcars-purple);
+      color: var(--text-bright);
+    }
+
+    .input-field {
+      background: rgba(153, 153, 255, 0.1);
+      border: 2px solid var(--lcars-blue);
+      border-radius: 15px;
+      padding: 0.75rem;
+      color: var(--text-bright);
+      font-family: inherit;
+      font-size: 0.95rem;
+      width: 100%;
+      margin-bottom: 0.5rem;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--lcars-orange);
+      background: rgba(255, 156, 0, 0.1);
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--lcars-sky);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Bottom Bar */
+    .lcars-bottom-bar {
+      background: var(--bg-panel);
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;
+      gap: 8px;
+      padding: 8px;
+      height: 60px;
+    }
+
+    .lcars-bottom-cap {
+      background: var(--lcars-purple);
+      border-radius: 30px 30px 0 0;
+    }
+
+    .lcars-bottom-content {
+      background: var(--lcars-peach);
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .lcars-main {
+        grid-template-columns: 1fr;
+      }
+
+      .lcars-left-panel,
+      .lcars-right-panel {
+        display: none;
+      }
+
+      .lcars-top-bar {
+        grid-template-columns: 60px 1fr 60px;
+        height: 70px;
+      }
+
+      .lcars-stats {
+        display: none;
+      }
+    }
+
+    /* Info Display Panels */
+    .info-panel {
+      background: rgba(153, 153, 255, 0.1);
+      border: 2px solid var(--lcars-blue);
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(153, 153, 255, 0.2);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--lcars-sky);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      color: var(--text-bright);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="lcars-frame">
+    
+    <!-- Top Bar -->
+    <div class="lcars-top-bar">
+      <div class="lcars-cap"></div>
+      <div class="lcars-title">
+        U.S.S. ENTERPRISE NCC-1701-D
+      </div>
+      <div class="lcars-stats">
+        <div class="lcars-stat-bar">
+          <span>STARDATE</span>
+          <span id="stardate">47988.1</span>
+        </div>
+        <div class="lcars-stat-bar danger">
+          <span>HOSTILES</span>
+          <span id="klingons">12</span>
+        </div>
+      </div>
+      <div class="lcars-cap"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="lcars-main">
+      
+      <!-- Left: Sensors -->
+      <aside class="lcars-left-panel">
+        <div class="panel-header">
+          Tactical Sensors
+        </div>
+        <div class="sensor-grid-container">
+          <div class="sensor-grid" id="sensorGrid">
+            <!-- Populated by JS -->
+          </div>
+          <div class="sensor-legend">
+            <div class="legend-item">
+              <div class="legend-icon" style="background: var(--lcars-orange);">E</div>
+              <span>Enterprise</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-icon" style="background: var(--lcars-red);">K</div>
+              <span>Klingon</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-icon" style="background: var(--lcars-sky);">B</div>
+              <span>Starbase</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-icon" style="background: var(--lcars-tangerine);">★</div>
+              <span>Star</span>
+            </div>
+          </div>
+
+          <!-- Status Info -->
+          <div class="info-panel">
+            <div class="info-row">
+              <span class="info-label">Energy</span>
+              <span class="info-value" id="energy">3000</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Shields</span>
+              <span class="info-value" id="shields">0</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Torpedoes</span>
+              <span class="info-value" id="torpedoes">10</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Position</span>
+              <span class="info-value" id="position">Q 0,0 / S 4,4</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: Terminal -->
+      <main class="lcars-center-panel">
+        <div class="terminal-output" id="terminal">
+          <div class="terminal-line alert">╔═══════════════════════════════════════════════════╗</div>
+          <div class="terminal-line alert">║   TACTICAL SITUATION BRIEFING  //  PRIORITY ONE   ║</div>
+          <div class="terminal-line alert">╚═══════════════════════════════════════════════════╝</div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line">Captain, Starfleet Command has detected Klingon vessels</div>
+          <div class="terminal-line">operating in Federation space.</div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line success">MISSION PARAMETERS:</div>
+          <div class="terminal-line">  • Locate and neutralize 12 Klingon warships</div>
+          <div class="terminal-line">  • Time limit: 30 stardates</div>
+          <div class="terminal-line">  • Starbases available for resupply</div>
+          <div class="terminal-line">&nbsp;</div>
+          <div class="terminal-line" style="color: var(--lcars-sky);">Use tactical commands or quick action buttons →</div>
+          <div class="terminal-line" style="color: var(--lcars-sky);">Type HELP for full command reference</div>
+          <div class="terminal-line">&nbsp;</div>
+        </div>
+
+        <div class="terminal-input-area">
+          <span class="prompt">▶</span>
+          <input type="text" 
+                 class="lcars-input" 
+                 id="commandInput"
+                 placeholder="ENTER TACTICAL COMMAND..."
+                 autocomplete="off"
+                 spellcheck="false"
+                 autofocus>
+        </div>
+      </main>
+
+      <!-- Right: Commands -->
+      <aside class="lcars-right-panel">
+        
+        <!-- Navigation -->
+        <div class="command-section">
+          <h3>Navigation</h3>
+          <div>
+            <label class="input-label">Course (1-8)</label>
+            <input type="number" class="input-field" id="navCourse" min="1" max="8" value="1">
+          </div>
+          <div>
+            <label class="input-label">Warp Factor</label>
+            <input type="number" class="input-field" id="navWarp" min="0.1" max="9" step="0.1" value="1.0">
+          </div>
+          <button class="lcars-button primary" onclick="ui.navigate()">ENGAGE</button>
+        </div>
+
+        <!-- Weapons -->
+        <div class="command-section">
+          <h3>Tactical Systems</h3>
+          <div>
+            <label class="input-label">Phaser Power</label>
+            <input type="range" class="input-field" id="phaserPower" min="0" max="3000" step="50" value="200" oninput="ui.updatePhaserDisplay()">
+            <div style="text-align: center; color: var(--lcars-red); font-weight: 700; margin-bottom: 0.5rem;" id="phaserDisplay">200 UNITS</div>
+          </div>
+          <button class="lcars-button danger" onclick="ui.firePhasers()">FIRE PHASERS</button>
+          
+          <div style="margin-top: 1rem;">
+            <label class="input-label">Torpedo Course</label>
+            <input type="number" class="input-field" id="torpedoCourse" min="1" max="8" value="1">
+          </div>
+          <button class="lcars-button danger" onclick="ui.fireTorpedo()">LAUNCH TORPEDO</button>
+        </div>
+
+        <!-- Shields -->
+        <div class="command-section">
+          <h3>Defensive Systems</h3>
+          <div>
+            <label class="input-label">Shield Energy</label>
+            <input type="number" class="input-field" id="shieldTransfer" min="0" max="1000" step="50" value="100">
+          </div>
+          <button class="lcars-button secondary" onclick="ui.shields()">TRANSFER ENERGY</button>
+        </div>
+
+        <!-- Sensors -->
+        <div class="command-section">
+          <h3>Sensors & Systems</h3>
+          <button class="lcars-button" onclick="ui.srs()">SHORT RANGE SCAN</button>
+          <button class="lcars-button" onclick="ui.lrs()">LONG RANGE SCAN</button>
+          <button class="lcars-button" onclick="ui.damage()">DAMAGE REPORT</button>
+          <button class="lcars-button" onclick="ui.computer()">COMPUTER</button>
+        </div>
+
+        <!-- Utility -->
+        <div class="command-section">
+          <button class="lcars-button secondary" onclick="ui.help()">HELP</button>
+          <button class="lcars-button" onclick="ui.newGame()">NEW MISSION</button>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="lcars-bottom-bar">
+      <div class="lcars-bottom-cap"></div>
+      <div class="lcars-bottom-content" id="statusMessage">
+        TACTICAL SYSTEMS ONLINE // ALL SYSTEMS NOMINAL
+      </div>
+      <div class="lcars-bottom-cap"></div>
+    </div>
+
+  </div>
+
+  <script src="../shared/game-core.js"></script>
+  <script>
+    // TNG LCARS UI Controller
+    const ui = {
+      terminal: document.getElementById('terminal'),
+      statusMessage: document.getElementById('statusMessage'),
+      
+      init() {
+        this.renderSensorGrid();
+        this.setupInput();
+        this.updateStatus();
+      },
+      
+      renderSensorGrid() {
+        const grid = document.getElementById('sensorGrid');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'sensor-cell';
+            cell.textContent = '·';
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+            
+            // Demo data
+            if (x === 4 && y === 4) {
+              cell.className = 'sensor-cell enterprise';
+              cell.textContent = 'E';
+            } else if ((x === 2 && y === 3) || (x === 6 && y === 5)) {
+              cell.className = 'sensor-cell klingon';
+              cell.textContent = 'K';
+            } else if (x === 1 && y === 7) {
+              cell.className = 'sensor-cell starbase';
+              cell.textContent = 'B';
+            } else if (Math.random() < 0.1) {
+              cell.className = 'sensor-cell star';
+              cell.textContent = '★';
+            }
+            
+            grid.appendChild(cell);
+          }
+        }
+      },
+      
+      setupInput() {
+        const input = document.getElementById('commandInput');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            const cmd = input.value.trim().toUpperCase();
+            if (cmd) {
+              this.executeCommand(cmd);
+              input.value = '';
+            }
+          }
+        });
+      },
+      
+      executeCommand(cmd) {
+        this.addLine(`▶ ${cmd}`, 'command');
+        
+        if (cmd === 'HELP') {
+          this.showHelp();
+        } else if (cmd === 'SRS') {
+          this.srs();
+        } else if (cmd.startsWith('NAV ')) {
+          this.addLine('Navigation system engaged...', 'success');
+          this.setStatus('WARP DRIVE ACTIVE');
+        } else if (cmd.startsWith('PHA ')) {
+          this.addLine('Phasers armed and firing!', 'alert');
+          this.setStatus('WEAPONS HOT');
+        } else if (cmd.startsWith('TOR ')) {
+          this.addLine('Photon torpedo away!', 'alert');
+          this.setStatus('TORPEDO LAUNCHED');
+        } else {
+          this.addLine('Command acknowledged. Processing...', 'success');
+        }
+      },
+      
+      showHelp() {
+        this.addLine('═══════════════════════════════════════', 'alert');
+        this.addLine('LCARS COMMAND REFERENCE', 'alert');
+        this.addLine('═══════════════════════════════════════', 'alert');
+        this.addLine('');
+        this.addLine('NAV [course] [warp] - Engage warp drive');
+        this.addLine('  Course: 1-8 (compass directions)');
+        this.addLine('  Warp: 0.1-9.0 (warp factor)');
+        this.addLine('');
+        this.addLine('PHA [energy] - Fire phaser array');
+        this.addLine('TOR [course] - Launch photon torpedo');
+        this.addLine('SHE [amount] - Adjust shield strength');
+        this.addLine('');
+        this.addLine('SRS - Short range sensors');
+        this.addLine('LRS - Long range sensors');
+        this.addLine('DAM - Damage control report');
+        this.addLine('COM - Access library computer');
+        this.addLine('');
+        this.addLine('Or use the tactical control panels →');
+      },
+      
+      navigate() {
+        const course = document.getElementById('navCourse').value;
+        const warp = document.getElementById('navWarp').value;
+        this.addLine(`▶ NAV ${course} ${warp}`, 'command');
+        this.addLine(`Engaging warp ${warp}, course ${course}...`, 'success');
+        this.setStatus(`WARP ${warp} ENGAGED`);
+        
+        setTimeout(() => {
+          this.addLine('Position updated. Sensors recalibrating...', 'success');
+          this.renderSensorGrid();
+          this.setStatus('ALL SYSTEMS NOMINAL');
+        }, 1500);
+      },
+      
+      firePhasers() {
+        const power = document.getElementById('phaserPower').value;
+        this.addLine(`▶ PHA ${power}`, 'command');
+        this.addLine('Phaser banks charging...', 'alert');
+        this.setStatus('WEAPONS ARMED');
+        
+        setTimeout(() => {
+          this.addLine(`Firing ${power} units at all targets...`, 'alert');
+          this.addLine('Direct hit! Target shields damaged!', 'success');
+          this.setStatus('WEAPONS HOT');
+        }, 800);
+      },
+      
+      fireTorpedo() {
+        const course = document.getElementById('torpedoCourse').value;
+        this.addLine(`▶ TOR ${course}`, 'command');
+        this.addLine('Photon torpedo loaded. Firing...', 'alert');
+        this.setStatus('TORPEDO AWAY');
+        
+        setTimeout(() => {
+          this.addLine('Direct hit! Target destroyed!', 'success');
+          this.setStatus('TARGET ELIMINATED');
+        }, 1000);
+      },
+      
+      shields() {
+        const amount = document.getElementById('shieldTransfer').value;
+        this.addLine(`▶ SHE ${amount}`, 'command');
+        this.addLine(`Transferring ${amount} units to shields...`, 'success');
+        this.setStatus('SHIELDS ADJUSTING');
+        
+        const current = parseInt(document.getElementById('shields').textContent);
+        document.getElementById('shields').textContent = current + parseInt(amount);
+      },
+      
+      srs() {
+        this.addLine('▶ SRS', 'command');
+        this.addLine('Short range sensors active. Scanning...', 'success');
+        this.addLine('Tactical display updated. See sensor panel ←', 'success');
+        this.setStatus('SENSORS ACTIVE');
+      },
+      
+      lrs() {
+        this.addLine('▶ LRS', 'command');
+        this.addLine('Long range sensors scanning adjacent sectors...', 'success');
+        this.addLine('3 sectors contain Klingon vessels', 'alert');
+        this.addLine('1 sector contains a starbase', 'success');
+      },
+      
+      damage() {
+        this.addLine('▶ DAM', 'command');
+        this.addLine('═══════════════════════════════════════', 'alert');
+        this.addLine('DAMAGE CONTROL REPORT', 'alert');
+        this.addLine('═══════════════════════════════════════', 'alert');
+        this.addLine('Warp Drive: OPERATIONAL');
+        this.addLine('Impulse Engines: OPERATIONAL');
+        this.addLine('Phaser Array: OPERATIONAL');
+        this.addLine('Photon Torpedoes: OPERATIONAL');
+        this.addLine('Shields: OPERATIONAL');
+        this.addLine('Sensors: OPERATIONAL');
+        this.addLine('');
+        this.addLine('All systems nominal, Captain.', 'success');
+      },
+      
+      computer() {
+        this.addLine('▶ COM', 'command');
+        this.addLine('Computer core online. Awaiting query...', 'success');
+        this.addLine('Available functions: Galactic records, Status reports', 'success');
+      },
+      
+      help() {
+        this.executeCommand('HELP');
+      },
+      
+      newGame() {
+        if (confirm('Begin new tactical simulation?')) {
+          location.reload();
+        }
+      },
+      
+      updatePhaserDisplay() {
+        const power = document.getElementById('phaserPower').value;
+        document.getElementById('phaserDisplay').textContent = `${power} UNITS`;
+      },
+      
+      addLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `terminal-line ${className}`;
+        line.textContent = text;
+        this.terminal.appendChild(line);
+        this.terminal.scrollTop = this.terminal.scrollHeight;
+      },
+      
+      setStatus(message) {
+        this.statusMessage.textContent = message;
+        setTimeout(() => {
+          this.statusMessage.textContent = 'TACTICAL SYSTEMS ONLINE // ALL SYSTEMS NOMINAL';
+        }, 3000);
+      },
+      
+      updateStatus() {
+        // This will connect to actual game state
+        document.getElementById('stardate').textContent = '47988.1';
+        document.getElementById('energy').textContent = '3000';
+        document.getElementById('shields').textContent = '0';
+        document.getElementById('torpedoes').textContent = '10';
+        document.getElementById('klingons').textContent = '12';
+        document.getElementById('position').textContent = 'Q 0,0 / S 4,4';
+      }
+    };
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      ui.init();
+    });
+  </script>
+</body>
+</html>
+
+

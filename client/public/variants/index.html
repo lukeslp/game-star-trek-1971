@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Trek 1971 - UX Variants</title>
+  <meta name="description" content="Choose your Star Trek 1971 experience. 5 distinct modern UX interpretations of the classic game.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0e1a;
+      --panel: #141824;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f5f6f9;
+      --muted: rgba(245, 246, 249, 0.65);
+      --accent: #f7c600;
+    }
+
+    body {
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      background: radial-gradient(circle at top, rgba(10, 15, 23, 0.9), var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 3rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .intro {
+      max-width: 700px;
+      margin: 2rem auto;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* Variant Grid */
+    .variants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .variant-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .variant-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(247, 198, 0, 0.2);
+    }
+
+    .variant-preview {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Variant-specific preview styles */
+    .preview-brutalist {
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      border-bottom: 4px solid #fff;
+    }
+
+    .preview-neomorph {
+      background: linear-gradient(135deg, #e4e9f2 0%, #eef3fb 100%);
+      color: #2c3e50;
+      box-shadow: 
+        inset -8px -8px 16px rgba(255, 255, 255, 0.9),
+        inset 8px 8px 16px rgba(163, 177, 198, 0.6);
+    }
+
+    .preview-glass {
+      background: linear-gradient(135deg, #1a0a2e 0%, #0a0a1a 100%);
+      position: relative;
+    }
+
+    .preview-glass::before {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .preview-glass .emoji {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 20px #00d9ff);
+    }
+
+    .preview-mobile {
+      background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+      color: #4a9eff;
+    }
+
+    .preview-cyberpunk {
+      background: #000;
+      color: #00ffff;
+      text-shadow: 
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        2px 0 5px #ff00ff,
+        -2px 0 5px #ff00ff;
+      position: relative;
+    }
+
+    .preview-cyberpunk::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 255, 255, 0.05) 2px,
+        rgba(0, 255, 255, 0.05) 4px
+      );
+    }
+
+    .variant-content {
+      padding: 1.75rem;
+    }
+
+    .variant-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .variant-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .variant-description {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .features li {
+      padding: 0.5rem 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .features li::before {
+      content: '→ ';
+      color: var(--accent);
+    }
+
+    .play-button {
+      display: block;
+      width: 100%;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .play-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(247, 198, 0, 0.4);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Comparison Table */
+    .comparison {
+      margin: 4rem 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+
+    .comparison h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+      .variants-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Star Trek: Tactical Command</h1>
+      <p class="subtitle">Choose Your Interface</p>
+      <p class="intro">
+        Experience the classic starship command simulator through different visual paradigms.
+        Each interface presents the same tactical situation with a distinct design approach.
+      </p>
+    </header>
+
+    <!-- Featured: TNG LCARS -->
+    <div style="margin-bottom: 3rem;">
+      <div class="variant-card" style="max-width: 900px; margin: 0 auto;">
+        <div class="variant-preview" style="height: 250px; background: #000; color: #ff9c00; font-family: 'Antonio', sans-serif; font-size: 2.5rem; font-weight: 700; border-bottom: 4px solid #ff9c00; position: relative;">
+          <div style="position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; border: 3px solid #ff9c00; border-radius: 30px; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 20px #ff9c00;">
+            NCC-1701-D
+          </div>
+        </div>
+        <div class="variant-content">
+          <h2>TNG LCARS Interface <span style="background: var(--accent); color: var(--bg); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">RECOMMENDED</span></h2>
+          <div class="variant-tag">Next Generation • Interactive Demo</div>
+          <p class="variant-description">
+            Authentic LCARS (Library Computer Access/Retrieval System) interface inspired by Star Trek: The Next Generation.
+            Orange/purple curved panels, touch-optimized controls, that distinctive TNG aesthetic. This variant has enhanced interactivity!
+          </p>
+          <ul class="features">
+            <li>Authentic LCARS color palette (orange, purple, blue)</li>
+            <li>Curved panel design with rounded buttons</li>
+            <li>Interactive command responses</li>
+            <li>Animated tactical feedback</li>
+            <li>Clean, optimistic 24th-century aesthetic</li>
+          </ul>
+          <a href="tng/" class="play-button">ENGAGE // TNG LCARS</a>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="text-align: center; color: var(--muted); font-size: 1.25rem; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.1em;">Experimental Variants</h2>
+
+    <!-- Variant Cards -->
+    <div class="variants-grid">
+      
+      <!-- Variant 1: Brutalist -->
+      <div class="variant-card">
+        <div class="variant-preview preview-brutalist">
+          <span style="font-size: 4rem;">█</span>
+        </div>
+        <div class="variant-content">
+          <h2>Brutalist Terminal</h2>
+          <div class="variant-tag">Pure Function</div>
+          <p class="variant-description">
+            Raw, utilitarian interface. Pure black and white. ASCII graphics. Dense information.
+            Maximum efficiency, zero decoration.
+          </p>
+          <ul class="features">
+            <li>Pure monochrome aesthetics</li>
+            <li>ASCII art sector display</li>
+            <li>Terminal-first interaction</li>
+            <li>Scanline CRT effect</li>
+            <li>Keyboard-only navigation</li>
+          </ul>
+          <a href="brutalist/" class="play-button">Play Brutalist</a>
+        </div>
+      </div>
+
+      <!-- Variant 2: Neumorphic -->
+      <div class="variant-card">
+        <div class="variant-preview preview-neomorph">
+          <span style="font-size: 4rem;">◯</span>
+        </div>
+        <div class="variant-content">
+          <h2>Neumorphic Space Command</h2>
+          <div class="variant-tag">Soft & Tactile</div>
+          <p class="variant-description">
+            Depth through shadows. Soft, embossed interface. Feels like physical buttons.
+            Clean and modern with subtle sophistication.
+          </p>
+          <ul class="features">
+            <li>Dual-shadow depth effects</li>
+            <li>Embossed button interactions</li>
+            <li>Soft color palette</li>
+            <li>Floating status cards</li>
+            <li>Tactile press animations</li>
+          </ul>
+          <a href="neumorphic/" class="play-button">Play Neumorphic</a>
+        </div>
+      </div>
+
+      <!-- Variant 3: Glassomorphism -->
+      <div class="variant-card">
+        <div class="variant-preview preview-glass">
+          <span class="emoji" style="font-size: 4rem;">◈</span>
+        </div>
+        <div class="variant-content">
+          <h2>Glassomorphism HUD</h2>
+          <div class="variant-tag">Frosted Future</div>
+          <p class="variant-description">
+            Translucent panels with backdrop blur. Floating holographic interface.
+            Neon accents on deep space background.
+          </p>
+          <ul class="features">
+            <li>Frosted glass panels</li>
+            <li>Backdrop blur effects</li>
+            <li>Animated space background</li>
+            <li>Holographic sensor grid</li>
+            <li>Neon glow effects</li>
+          </ul>
+          <a href="glass/" class="play-button">Play Glassomorphism</a>
+        </div>
+      </div>
+
+      <!-- Variant 4: Mobile-First -->
+      <div class="variant-card">
+        <div class="variant-preview preview-mobile">
+          <span style="font-size: 4rem;">📱</span>
+        </div>
+        <div class="variant-content">
+          <h2>Mobile Card Interface</h2>
+          <div class="variant-tag">Gesture-Driven</div>
+          <p class="variant-description">
+            Designed for thumbs. Swipeable cards, bottom-sheet modals.
+            Large touch targets, haptic feedback, app-like experience.
+          </p>
+          <ul class="features">
+            <li>Bottom navigation bar</li>
+            <li>Swipe-up modal sheets</li>
+            <li>Large 60px+ touch targets</li>
+            <li>Haptic feedback (vibration)</li>
+            <li>Thumb-zone optimized</li>
+          </ul>
+          <a href="mobile/" class="play-button">Play Mobile</a>
+        </div>
+      </div>
+
+      <!-- Variant 5: Cyberpunk -->
+      <div class="variant-card">
+        <div class="variant-preview preview-cyberpunk">
+          <span style="font-size: 4rem;">⚡</span>
+        </div>
+        <div class="variant-content">
+          <h2>Cyberpunk Neon Terminal</h2>
+          <div class="variant-tag">Retro-Future</div>
+          <p class="variant-description">
+            High-contrast neon on pure black. CRT scanlines, glitch effects, chromatic aberration.
+            Aggressive aesthetic for maximum cyberpunk vibes.
+          </p>
+          <ul class="features">
+            <li>Neon pink/cyan/yellow palette</li>
+            <li>CRT scanline overlay</li>
+            <li>Glitch text effects</li>
+            <li>Chromatic aberration</li>
+            <li>Sharp geometric clipping</li>
+          </ul>
+          <a href="cyberpunk/" class="play-button">Play Cyberpunk</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison">
+      <h2>Feature Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Brutalist</th>
+            <th>Neumorphic</th>
+            <th>Glass</th>
+            <th>Mobile</th>
+            <th>Cyberpunk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Best For</strong></td>
+            <td>Keyboard users</td>
+            <td>Desktop comfort</td>
+            <td>Visual appeal</td>
+            <td>Touch devices</td>
+            <td>Atmosphere</td>
+          </tr>
+          <tr>
+            <td><strong>Colors</strong></td>
+            <td>B&W only</td>
+            <td>Soft blues</td>
+            <td>Neon multi</td>
+            <td>Dark modern</td>
+            <td>Neon high</td>
+          </tr>
+          <tr>
+            <td><strong>Complexity</strong></td>
+            <td>Minimal</td>
+            <td>Balanced</td>
+            <td>Detailed</td>
+            <td>Simple</td>
+            <td>Dense</td>
+          </tr>
+          <tr>
+            <td><strong>Graphics</strong></td>
+            <td>ASCII art</td>
+            <td>Soft shapes</td>
+            <td>Holographic</td>
+            <td>Clean icons</td>
+            <td>Sharp edges</td>
+          </tr>
+          <tr>
+            <td><strong>Input</strong></td>
+            <td>Terminal</td>
+            <td>Mixed</td>
+            <td>Terminal</td>
+            <td>Touch/swipe</td>
+            <td>Terminal</td>
+          </tr>
+          <tr>
+            <td><strong>Mobile</strong></td>
+            <td>Basic</td>
+            <td>Good</td>
+            <td>Good</td>
+            <td>Optimized</td>
+            <td>Basic</td>
+          </tr>
+          <tr>
+            <td><strong>Vibe</strong></td>
+            <td>Raw utility</td>
+            <td>Calm depth</td>
+            <td>Sci-fi sleek</td>
+            <td>App polish</td>
+            <td>Neon chaos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Design Philosophy -->
+    <div class="comparison">
+      <h2>Design Philosophy</h2>
+      <p style="color: var(--muted); line-height: 1.8; margin-bottom: 1.5rem;">
+        Each variant represents a different approach to modern interface design in 2025:
+      </p>
+      
+      <div style="display: grid; gap: 1.5rem;">
+        <div>
+          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">🔲 Brutalist</h3>
+          <p style="color: var(--muted); line-height: 1.7;">
+            Inspired by brutalist architecture and early computing. Rejects decoration for pure function.
+            Everything you need, nothing you don't. Form follows function to the extreme.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">◯ Neumorphic</h3>
+          <p style="color: var(--muted); line-height: 1.7;">
+            Soft UI trend popularized in 2020s. Creates depth through shadows rather than borders.
+            Feels tactile and physical. Calm, approachable, easy on the eyes.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">◈ Glassomorphism</h3>
+          <p style="color: var(--muted); line-height: 1.7;">
+            macOS Big Sur influence. Frosted glass with backdrop blur. Futuristic and clean.
+            Layers create depth, transparency creates lightness.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">📱 Mobile-First</h3>
+          <p style="color: var(--muted); line-height: 1.7;">
+            iOS/Android native app conventions. Bottom nav, modal sheets, gesture controls.
+            Optimized for one-handed use. Haptic feedback for tactile response.
+          </p>
+        </div>
+
+        <div>
+          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">⚡ Cyberpunk</h3>
+          <p style="color: var(--muted); line-height: 1.7;">
+            1980s sci-fi meets modern web. Neon-on-black, CRT effects, glitch aesthetic.
+            Maximum atmosphere and personality. High contrast for drama.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div style="margin-top: 3rem; text-align: center;">
+      <p style="color: var(--muted); margin-bottom: 1rem;">Or skip directly to:</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="../" style="color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 8px;">← Original Version</a>
+        <a href="/games/" style="color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 8px;">All Games</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        <strong>Star Trek 1971</strong> - Mike Mayfield (1971) · Bob Leedom (Super Star Trek, 1974)
+        <br>
+        This implementation: Luke Steuber (2025)
+        <br>
+        5 UX Variants exploring modern design paradigms
+      </p>
+    </footer>
+  </div>
+</body>
+</html>
+

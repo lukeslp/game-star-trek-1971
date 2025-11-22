@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STAR TREK 1971 // CYBERPUNK</title>
+  <meta name="description" content="Star Trek 1971 - Cyberpunk Neon Terminal. High contrast, glitch effects, retro-future.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --neon-pink: #ff00ff;
+      --neon-cyan: #00ffff;
+      --neon-yellow: #ffff00;
+      --neon-green: #00ff00;
+      --bg: #000000;
+      --text: #00ffff;
+    }
+
+    body {
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* CRT Scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 255, 0.03) 0px,
+        transparent 1px,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 3px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* CRT Flicker */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 255, 255, 0.02);
+      pointer-events: none;
+      z-index: 9999;
+      animation: flicker 0.15s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.95; }
+      50% { opacity: 1; }
+      100% { opacity: 0.98; }
+    }
+
+    /* Screen Curve (CRT effect) */
+    .terminal-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      filter: contrast(1.1);
+    }
+
+    /* Header */
+    .cyber-header {
+      background: linear-gradient(90deg, var(--neon-pink) 0%, var(--neon-cyan) 100%);
+      padding: 2px;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%);
+    }
+
+    .header-content {
+      background: var(--bg);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%);
+    }
+
+    .header-content h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px var(--neon-cyan);
+      letter-spacing: 0.1em;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .stat {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .stat.danger {
+      color: var(--neon-pink);
+      text-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    /* Main Layout */
+    .main-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .cyber-sidebar {
+      background: var(--bg);
+      border-right: 2px solid var(--neon-pink);
+      box-shadow: 
+        2px 0 10px var(--neon-pink),
+        inset 0 0 50px rgba(255, 0, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 0, 255, 0.3);
+    }
+
+    .sidebar-section h2 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+      margin-bottom: 1rem;
+      letter-spacing: 0.15em;
+    }
+
+    /* Sector Grid */
+    .cyber-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 2px;
+      background: rgba(255, 0, 255, 0.2);
+      padding: 2px;
+    }
+
+    .cyber-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: rgba(0, 255, 255, 0.3);
+    }
+
+    .cyber-cell.enterprise {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+      background: rgba(0, 255, 255, 0.1);
+      border-color: var(--neon-cyan);
+      animation: pulse-cyan 2s ease-in-out infinite;
+    }
+
+    .cyber-cell.klingon {
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+      background: rgba(255, 0, 255, 0.1);
+      border-color: var(--neon-pink);
+      animation: pulse-pink 1.5s ease-in-out infinite;
+    }
+
+    .cyber-cell.starbase {
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green);
+      border-color: var(--neon-green);
+    }
+
+    .cyber-cell.star {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 8px var(--neon-yellow);
+    }
+
+    @keyframes pulse-cyan {
+      0%, 100% { box-shadow: 0 0 5px var(--neon-cyan); }
+      50% { box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan); }
+    }
+
+    @keyframes pulse-pink {
+      0%, 100% { box-shadow: 0 0 5px var(--neon-pink); }
+      50% { box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink); }
+    }
+
+    /* Commands */
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .cmd-btn {
+      background: var(--bg);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      text-shadow: 0 0 8px var(--neon-cyan);
+      padding: 0.75rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .cmd-btn:hover {
+      background: rgba(0, 255, 255, 0.1);
+      box-shadow: 
+        0 0 10px var(--neon-cyan),
+        inset 0 0 10px rgba(0, 255, 255, 0.1);
+    }
+
+    .cmd-btn:active {
+      transform: translate(1px, 1px);
+    }
+
+    /* Terminal Output */
+    .cyber-terminal {
+      padding: 1.5rem;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .cyber-terminal::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .cyber-terminal::-webkit-scrollbar-track {
+      background: var(--bg);
+      border-left: 1px solid var(--neon-pink);
+    }
+
+    .cyber-terminal::-webkit-scrollbar-thumb {
+      background: var(--neon-pink);
+      box-shadow: 0 0 5px var(--neon-pink);
+    }
+
+    .output-line {
+      font-size: 0.95rem;
+      margin: 4px 0;
+      text-shadow: 0 0 3px var(--neon-cyan);
+    }
+
+    .output-line.command {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 5px var(--neon-yellow);
+      font-weight: bold;
+    }
+
+    .output-line.alert {
+      color: var(--neon-pink);
+      text-shadow: 0 0 8px var(--neon-pink);
+      font-weight: bold;
+      animation: glitch 3s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      10% { transform: translate(-2px, 1px); }
+      20% { transform: translate(2px, -1px); }
+      30% { transform: translate(0); }
+    }
+
+    /* Input */
+    .input-section {
+      border-top: 2px solid var(--neon-pink);
+      background: var(--bg);
+      padding: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      box-shadow: 0 -5px 20px rgba(255, 0, 255, 0.3);
+    }
+
+    .prompt {
+      font-size: 1.5rem;
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+      font-weight: bold;
+    }
+
+    .cyber-input {
+      flex: 1;
+      background: var(--bg);
+      border: 2px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      text-shadow: 0 0 5px var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+      clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    }
+
+    .cyber-input:focus {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+      animation: input-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes input-pulse {
+      0%, 100% { border-color: var(--neon-cyan); }
+      50% { border-color: var(--neon-pink); }
+    }
+
+    .exec-btn {
+      background: var(--neon-pink);
+      color: var(--bg);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%);
+      box-shadow: 0 0 20px var(--neon-pink);
+      transition: all 0.2s;
+    }
+
+    .exec-btn:hover {
+      box-shadow: 0 0 30px var(--neon-pink), 0 0 50px var(--neon-pink);
+      transform: scale(1.05);
+    }
+
+    .exec-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Glitch Text Effect */
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 var(--neon-pink);
+      animation: glitch-1 0.3s infinite;
+      clip: rect(44px, 450px, 56px, 0);
+    }
+
+    .glitch::after {
+      left: -2px;
+      text-shadow: 2px 0 var(--neon-cyan);
+      animation: glitch-2 0.3s infinite;
+      clip: rect(44px, 450px, 56px, 0);
+    }
+
+    @keyframes glitch-1 {
+      0% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      20% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      40% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      60% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      80% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      100% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+    }
+
+    @keyframes glitch-2 {
+      0% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      20% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      40% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      60% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      80% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+      100% { clip: rect(random(100) + px, 9999px, random(100) + px, 0); }
+    }
+
+    /* Chromatic Aberration on Title */
+    h1 {
+      position: relative;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .cyber-sidebar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal-container">
+    <!-- Header with Neon -->
+    <div class="cyber-header">
+      <div class="header-content">
+        <h1 class="glitch" data-text="STAR TREK//2200">STAR TREK//2200</h1>
+        <div class="header-stats">
+          <span class="stat">SD:<span id="stardate">2200.0</span></span>
+          <span class="stat">E:<span id="energy">3000</span></span>
+          <span class="stat danger">K:<span id="klingons">12</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout" style="flex: 1; display: grid; grid-template-columns: 320px 1fr;">
+      <!-- Sidebar with Grid -->
+      <div class="cyber-sidebar">
+        <div class="sidebar-section">
+          <h2>// SENSORS_ARRAY</h2>
+          <div class="cyber-grid" id="sectorGrid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h2>// QUICK_CMD</h2>
+          <div class="cmd-list">
+            <button class="cmd-btn" onclick="ui.cmd('SRS')">SRS_SCAN</button>
+            <button class="cmd-btn" onclick="ui.cmd('LRS')">LRS_SCAN</button>
+            <button class="cmd-btn" onclick="ui.cmd('DAM')">DMG_REPORT</button>
+            <button class="cmd-btn" onclick="ui.cmd('HELP')">HELP_SYS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminal Output -->
+      <div class="cyber-terminal" id="terminal">
+        <div class="output-line alert">╔═══════════════════════════════════════════════╗</div>
+        <div class="output-line alert">║  ⚠ MISSION CRITICAL  //  KLINGON THREAT  ⚠  ║</div>
+        <div class="output-line alert">╚═══════════════════════════════════════════════╝</div>
+        <div class="output-line">&nbsp;</div>
+        <div class="output-line" style="color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green);">
+          &gt;&gt; BRIEFING_LOADED
+        </div>
+        <div class="output-line">12 KLINGON_VESSELS detected in sector</div>
+        <div class="output-line">TIME_LIMIT: 30.0 stardates</div>
+        <div class="output-line">STARBASES_AVAILABLE: 2</div>
+        <div class="output-line">&nbsp;</div>
+        <div class="output-line" style="color: var(--neon-yellow); text-shadow: 0 0 5px var(--neon-yellow);">
+          ⚡ AWAITING_COMMAND
+        </div>
+        <div class="output-line" style="color: rgba(0,255,255,0.5);">
+          // Type HELP for command_list
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Zone -->
+    <div class="input-section">
+      <span class="prompt">&gt;&gt;</span>
+      <input type="text" 
+             class="cyber-input" 
+             id="commandInput" 
+             placeholder="ENTER_COMMAND..." 
+             autocomplete="off"
+             spellcheck="false"
+             autofocus>
+      <button class="exec-btn" onclick="ui.submit()">EXEC</button>
+    </div>
+  </div>
+
+  <script>
+    const ui = {
+      terminal: document.getElementById('terminal'),
+      
+      init() {
+        this.renderGrid();
+        this.setupInput();
+        this.startMatrixRain();
+      },
+      
+      renderGrid() {
+        const grid = document.getElementById('sectorGrid');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'cyber-cell';
+            cell.textContent = '·';
+            
+            // Demo
+            if (x === 4 && y === 4) {
+              cell.className = 'cyber-cell enterprise';
+              cell.textContent = 'E';
+            }
+            
+            grid.appendChild(cell);
+          }
+        }
+      },
+      
+      setupInput() {
+        const input = document.getElementById('commandInput');
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.submit();
+          }
+        });
+      },
+      
+      submit() {
+        const input = document.getElementById('commandInput');
+        const cmd = input.value.trim().toUpperCase();
+        if (cmd) {
+          this.addLine(`>> ${cmd}`, 'command');
+          this.process(cmd);
+          input.value = '';
+        }
+      },
+      
+      process(cmd) {
+        if (cmd === 'HELP') {
+          this.addLine('╔═══════════════════════════════╗', 'alert');
+          this.addLine('║  COMMAND_DATABASE  ║', 'alert');
+          this.addLine('╚═══════════════════════════════╝', 'alert');
+          this.addLine('NAV [course] [warp] - NAVIGATION_SYS');
+          this.addLine('PHA [energy] - PHASER_ARRAY');
+          this.addLine('TOR [course] - TORPEDO_TUBES');
+          this.addLine('SHE [amount] - SHIELD_MATRIX');
+          this.addLine('SRS - SHORT_RANGE_SCAN');
+          this.addLine('LRS - LONG_RANGE_SCAN');
+          this.addLine('DAM - DAMAGE_REPORT');
+          this.addLine('COM - COMPUTER_CORE');
+        } else {
+          this.addLine(`⚡ EXECUTING: ${cmd}`, 'alert');
+          this.addLine('// Full integration pending', '');
+        }
+      },
+      
+      cmd(command) {
+        this.addLine(`>> ${command}`, 'command');
+        this.process(command);
+      },
+      
+      addLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `output-line ${className}`;
+        line.textContent = text;
+        this.terminal.appendChild(line);
+        this.terminal.scrollTop = this.terminal.scrollHeight;
+      },
+      
+      startMatrixRain() {
+        // Optional: Add matrix-style character rain background
+        // Keeping it simple for now
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => ui.init());
+  </script>
+</body>
+</html>
+

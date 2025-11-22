@@ -1,0 +1,265 @@
+/**
+ * Scoring System for Star Trek 1971
+ * Calculates final score and grade based on performance metrics
+ */
+
+import type { GameState } from './types';
+
+export interface GameScore {
+  // Score components
+  klingonsDestroyed: number;
+  stardatesRemaining: number;
+  energyRemaining: number;
+  torpedoesRemaining: number;
+  speedBonus: number;
+  noDamageBonus: number;
+  perfectNavigationBonus: number;
+  
+  // Total
+  total: number;
+  
+  // Grade
+  grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
+  gradeDescription: string;
+}
+
+export interface ScoreBreakdown {
+  label: string;
+  points: number;
+  description?: string;
+}
+
+/**
+ * Calculate the player's final score
+ */
+export function calculateScore(state: GameState): GameScore {
+  const score: GameScore = {
+    klingonsDestroyed: 0,
+    stardatesRemaining: 0,
+    energyRemaining: 0,
+    torpedoesRemaining: 0,
+    speedBonus: 0,
+    noDamageBonus: 0,
+    perfectNavigationBonus: 0,
+    total: 0,
+    grade: 'F',
+    gradeDescription: ''
+  };
+
+  // Only calculate score if player won
+  if (!state.victory) {
+    score.grade = 'F';
+    score.gradeDescription = 'Mission Failed';
+    return score;
+  }
+
+  // Klingons destroyed: +100 each
+  const klingonsKilled = state.mission.initialKlingons - state.galaxy.klingonsRemaining;
+  score.klingonsDestroyed = klingonsKilled * 100;
+
+  // Stardates remaining: +10 per stardate
+  const stardatesUsed = state.stardate - state.initialStardate;
+  const stardatesLeft = Math.max(0, state.timeLimit - stardatesUsed);
+  score.stardatesRemaining = Math.floor(stardatesLeft * 10);
+
+  // Energy remaining: +1 per 100 energy
+  score.energyRemaining = Math.floor(state.ship.energy / 100);
+
+  // Torpedoes remaining: +50 each
+  score.torpedoesRemaining = state.ship.torpedoes * 50;
+
+  // Speed bonus: +100 per stardate if completed in under 20 stardates
+  if (stardatesUsed < 20) {
+    score.speedBonus = Math.floor((20 - stardatesUsed) * 100);
+  }
+
+  // No damage bonus: +1000 if no systems damaged
+  const hasNoDamage = state.systems.every(s => s.damage === 0);
+  if (hasNoDamage) {
+    score.noDamageBonus = 1000;
+  }
+
+  // Perfect navigation bonus: +500 if efficient movement
+  // (This could be enhanced with actual movement tracking)
+  // For now, award if time was under 15 stardates
+  if (stardatesUsed < 15) {
+    score.perfectNavigationBonus = 500;
+  }
+
+  // Calculate total
+  score.total = 
+    score.klingonsDestroyed +
+    score.stardatesRemaining +
+    score.energyRemaining +
+    score.torpedoesRemaining +
+    score.speedBonus +
+    score.noDamageBonus +
+    score.perfectNavigationBonus;
+
+  // Determine grade
+  const { grade, description } = calculateGrade(score.total);
+  score.grade = grade;
+  score.gradeDescription = description;
+
+  return score;
+}
+
+/**
+ * Determine grade based on total score
+ */
+function calculateGrade(total: number): { grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F', description: string } {
+  if (total >= 3000) {
+    return { grade: 'S', description: 'Legendary Captain' };
+  } else if (total >= 2000) {
+    return { grade: 'A', description: 'Excellent Command' };
+  } else if (total >= 1500) {
+    return { grade: 'B', description: 'Good Performance' };
+  } else if (total >= 1000) {
+    return { grade: 'C', description: 'Adequate Mission' };
+  } else if (total >= 500) {
+    return { grade: 'D', description: 'Barely Passing' };
+  } else {
+    return { grade: 'F', description: 'Needs Improvement' };
+  }
+}
+
+/**
+ * Get score breakdown as array for display
+ */
+export function getScoreBreakdown(score: GameScore): ScoreBreakdown[] {
+  const breakdown: ScoreBreakdown[] = [];
+
+  if (score.klingonsDestroyed > 0) {
+    breakdown.push({
+      label: 'Klingons Destroyed',
+      points: score.klingonsDestroyed,
+      description: `${score.klingonsDestroyed / 100} × 100`
+    });
+  }
+
+  if (score.stardatesRemaining > 0) {
+    breakdown.push({
+      label: 'Time Remaining',
+      points: score.stardatesRemaining,
+      description: `${(score.stardatesRemaining / 10).toFixed(1)} stardates × 10`
+    });
+  }
+
+  if (score.energyRemaining > 0) {
+    breakdown.push({
+      label: 'Energy Remaining',
+      points: score.energyRemaining,
+      description: `${score.energyRemaining * 100} energy`
+    });
+  }
+
+  if (score.torpedoesRemaining > 0) {
+    breakdown.push({
+      label: 'Torpedoes Remaining',
+      points: score.torpedoesRemaining,
+      description: `${score.torpedoesRemaining / 50} × 50`
+    });
+  }
+
+  if (score.speedBonus > 0) {
+    breakdown.push({
+      label: 'Speed Bonus',
+      points: score.speedBonus,
+      description: 'Completed in under 20 stardates'
+    });
+  }
+
+  if (score.noDamageBonus > 0) {
+    breakdown.push({
+      label: 'No Damage Bonus',
+      points: score.noDamageBonus,
+      description: 'Perfect condition maintained'
+    });
+  }
+
+  if (score.perfectNavigationBonus > 0) {
+    breakdown.push({
+      label: 'Navigation Bonus',
+      points: score.perfectNavigationBonus,
+      description: 'Efficient routing'
+    });
+  }
+
+  return breakdown;
+}
+
+/**
+ * Get grade color for CSS styling
+ */
+export function getGradeColor(grade: string): string {
+  switch (grade) {
+    case 'S':
+      return '#FFD700'; // Gold
+    case 'A':
+      return '#00FF88'; // Green
+    case 'B':
+      return '#4488FF'; // Blue
+    case 'C':
+      return '#FFAA00'; // Yellow
+    case 'D':
+      return '#FF8844'; // Orange
+    case 'F':
+      return '#FF4444'; // Red
+    default:
+      return '#FFFFFF'; // White
+  }
+}
+
+/**
+ * Format score for display with commas
+ */
+export function formatScore(score: number): string {
+  return score.toLocaleString();
+}
+
+/**
+ * Save high score to localStorage
+ */
+export function saveHighScore(score: GameScore): void {
+  const highScores = getHighScores();
+  
+  const newScore = {
+    score: score.total,
+    grade: score.grade,
+    date: new Date().toISOString(),
+    timestamp: Date.now()
+  };
+
+  highScores.push(newScore);
+  
+  // Keep only top 10 scores
+  highScores.sort((a, b) => b.score - a.score);
+  const top10 = highScores.slice(0, 10);
+  
+  localStorage.setItem('startrek_high_scores', JSON.stringify(top10));
+}
+
+/**
+ * Get high scores from localStorage
+ */
+export function getHighScores(): Array<{score: number; grade: string; date: string; timestamp: number}> {
+  const stored = localStorage.getItem('startrek_high_scores');
+  if (!stored) return [];
+  
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Check if current score is a new personal best
+ */
+export function isNewHighScore(score: number): boolean {
+  const highScores = getHighScores();
+  if (highScores.length === 0) return true;
+  
+  return score > highScores[0].score;
+}
+
