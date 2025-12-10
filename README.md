@@ -115,4 +115,15 @@ The original Star Trek game was created in 1971 by Mike Mayfield and became one 
 ## Credits
 
 Original game: Mike Mayfield (1971)
-This implementation: Luke Steuber
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file
+
+## Author
+
+**Luke Steuber**
+
+- Website: [lukesteuber.com](https://lukesteuber.com)
+- GitHub: [@lukeslp](https://github.com/lukeslp)
+- Bluesky: [@lukesteuber.com](https://bsky.app/profile/lukesteuber.com)
