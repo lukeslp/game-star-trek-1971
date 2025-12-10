@@ -59,22 +59,28 @@ export class GameEngine {
       stardatesRemaining: this.config.initialStardates,
       gameOver: false,
       victory: false,
-      messages: [
-        { text: "=== STAR TREK ===", type: "info" },
-        { text: "", type: "normal" },
-        { text: "Stardate " + this.config.initialStardate, type: "normal" },
-        { text: "", type: "normal" },
-        { text: "Your orders are as follows:", type: "normal" },
-        { text: "  Destroy the " + this.config.initialKlingons + " Klingon warships which have invaded", type: "warning" },
-        { text: "  the galaxy before they can attack Federation Headquarters", type: "warning" },
-        { text: "  on stardate " + (this.config.initialStardate + this.config.initialStardates) + ".", type: "warning" },
-        { text: "  This gives you " + this.config.initialStardates + " days.", type: "normal" },
-        { text: "", type: "normal" },
-        { text: "There are " + this.config.initialStarbases + " starbases in the galaxy for resupply.", type: "info" },
-        { text: "", type: "normal" },
-        { text: "Type HELP for a list of commands.", type: "info" },
-        { text: "", type: "normal" },
-      ],
+      messages: this.config.hotStart
+        ? [
+            { text: "★ STAR TREK - HOT START ★", type: "info" },
+            { text: `Mission: Destroy ${this.config.initialKlingons} Klingons in ${this.config.initialStardates} days.`, type: "warning" },
+            { text: "", type: "normal" },
+          ]
+        : [
+            { text: "=== STAR TREK ===", type: "info" },
+            { text: "", type: "normal" },
+            { text: "Stardate " + this.config.initialStardate, type: "normal" },
+            { text: "", type: "normal" },
+            { text: "Your orders are as follows:", type: "normal" },
+            { text: "  Destroy the " + this.config.initialKlingons + " Klingon warships which have invaded", type: "warning" },
+            { text: "  the galaxy before they can attack Federation Headquarters", type: "warning" },
+            { text: "  on stardate " + (this.config.initialStardate + this.config.initialStardates) + ".", type: "warning" },
+            { text: "  This gives you " + this.config.initialStardates + " days.", type: "normal" },
+            { text: "", type: "normal" },
+            { text: "There are " + this.config.initialStarbases + " starbases in the galaxy for resupply.", type: "info" },
+            { text: "", type: "normal" },
+            { text: "Type HELP for a list of commands.", type: "info" },
+            { text: "", type: "normal" },
+          ],
     };
   }
 

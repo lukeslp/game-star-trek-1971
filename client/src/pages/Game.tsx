@@ -5,7 +5,7 @@ import { GameEngine } from "@/lib/gameEngine";
 import { CommandProcessor } from "@/lib/commandProcessor";
 import { EntityType } from "@/types/game";
 import { useTour } from "@/hooks/useTour";
-import { HelpCircle, Trophy, Volume2, VolumeX } from "lucide-react";
+import { HelpCircle, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 import ScoreBreakdown from "@/components/ScoreBreakdown";
 import ArcadeNameEntry from "@/components/ArcadeNameEntry";
@@ -17,8 +17,11 @@ import {
   saveHighScore,
   getLastPlayerName,
   setLastPlayerName,
+  getHotStartPreference,
+  setHotStartPreference,
   type GameScore,
 } from "@/lib/gameScoring";
+import { DEFAULT_CONFIG } from "@/types/game";
 
 const BUTTON_STYLES = {
   primary: "bg-primary/10 border-primary/50 text-primary hover:bg-primary/30 hover:border-primary font-mono text-xl py-4",
@@ -30,7 +33,8 @@ const BUTTON_STYLES = {
 } as const;
 
 export default function Game() {
-  const [engine] = useState(() => new GameEngine());
+  const [hotStart, setHotStart] = useState(() => getHotStartPreference());
+  const [engine] = useState(() => new GameEngine({ ...DEFAULT_CONFIG, hotStart: getHotStartPreference() }));
   const [processor] = useState(() => new CommandProcessor(engine));
   const [, forceUpdate] = useState({});
   const [command, setCommand] = useState("");
@@ -42,6 +46,14 @@ export default function Game() {
   const consoleRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { hasSeenTour, startTour} = useTour();
+
+  // Toggle hot start preference (takes effect on next game)
+  const toggleHotStart = useCallback(() => {
+    const newState = !hotStart;
+    setHotStart(newState);
+    setHotStartPreference(newState);
+    audioEngine.playClick();
+  }, [hotStart]);
 
   // Toggle sound
   const toggleSound = useCallback(() => {
@@ -219,6 +231,16 @@ export default function Game() {
             ★ STAR TREK ★
           </h1>
           <div className="flex-1 flex items-center justify-end gap-2">
+            <Button
+              onClick={toggleHotStart}
+              variant="ghost"
+              size="sm"
+              className={hotStart ? "text-accent hover:text-accent" : "text-muted-foreground hover:text-primary"}
+              title={hotStart ? "Hot Start ON - skip intro on new game" : "Hot Start OFF - show full intro"}
+              aria-label={hotStart ? "Disable hot start" : "Enable hot start"}
+            >
+              <Zap className={`w-6 h-6 ${hotStart ? "fill-current" : ""}`} />
+            </Button>
             <Button
               onClick={toggleSound}
               variant="ghost"

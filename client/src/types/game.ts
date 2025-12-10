@@ -91,6 +91,7 @@ export interface GameConfig {
   initialStardates: number;
   initialEnergy: number;
   initialTorpedoes: number;
+  hotStart?: boolean; // Skip intro messages and start immediately
 }
 
 export const DEFAULT_CONFIG: GameConfig = {

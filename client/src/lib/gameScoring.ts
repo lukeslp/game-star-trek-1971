@@ -293,3 +293,19 @@ export function getLastPlayerName(): string {
 export function setLastPlayerName(name: string): void {
   localStorage.setItem('startrek_player_name', name.toUpperCase().slice(0, 3));
 }
+
+/**
+ * Gets the hot start preference from localStorage
+ * @returns true if hot start is enabled, false otherwise
+ */
+export function getHotStartPreference(): boolean {
+  return localStorage.getItem('startrek_hot_start') === 'true';
+}
+
+/**
+ * Sets the hot start preference in localStorage
+ * @param enabled - Whether hot start should be enabled
+ */
+export function setHotStartPreference(enabled: boolean): void {
+  localStorage.setItem('startrek_hot_start', enabled ? 'true' : 'false');
+}
