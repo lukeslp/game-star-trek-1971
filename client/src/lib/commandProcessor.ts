@@ -1,5 +1,6 @@
 import { GameEngine } from "./gameEngine";
 import { EntityType, SectorCoords } from "@/types/game";
+import { screenShake } from "./screenShake";
 
 export class CommandProcessor {
   private engine: GameEngine;
@@ -333,7 +334,8 @@ export class CommandProcessor {
 
     this.engine.addMessage("");
     this.engine.addMessage("Phasers fired!", "info");
-    
+    screenShake.shakePhaserFire();
+
     klingons.forEach(klingon => {
       const dx = klingon.position.sx - state.currentSector.sx;
       const dy = klingon.position.sy - state.currentSector.sy;
@@ -421,6 +423,7 @@ export class CommandProcessor {
       if (target) {
         if (target.type === EntityType.KLINGON) {
           this.engine.addMessage("*** KLINGON DESTROYED ***", "success");
+          screenShake.shakeTorpedoImpact();
           this.engine.removeEntity(target);
           quadrant.klingons--;
           state.klingonsRemaining--;
@@ -612,15 +615,18 @@ export class CommandProcessor {
 
       if (state.ship.shieldsUp && state.ship.shields > 0) {
         state.ship.shields -= damage;
+        screenShake.shakeKlingonAttack(damage);
         this.engine.addMessage("Shields hit for " + damage + " damage. Shields now at " + Math.max(0, state.ship.shields), "warning");
 
         if (state.ship.shields <= 0) {
           state.ship.shields = 0;
           state.ship.shieldsUp = false;
           this.engine.addMessage("*** SHIELDS DOWN ***", "error");
+          screenShake.shakeCritical();
         }
       } else {
         state.ship.energy -= damage;
+        screenShake.shakeKlingonAttack(damage);
         this.engine.addMessage("Hull hit for " + damage + " damage!", "error");
 
         // Random system damage
@@ -629,6 +635,7 @@ export class CommandProcessor {
           const system = systems[Math.floor(Math.random() * systems.length)];
           state.ship.damage[system] = Math.max(0, state.ship.damage[system] - 0.2);
           this.engine.addMessage(system + " damaged!", "error");
+          screenShake.shakeDamage();
         }
       }
     });

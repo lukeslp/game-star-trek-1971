@@ -7,6 +7,7 @@ import { EntityType } from "@/types/game";
 import { useTour } from "@/hooks/useTour";
 import { HelpCircle, Trophy, Volume2, VolumeX, Zap } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
+import { screenShake } from "@/lib/screenShake";
 import ScoreBreakdown from "@/components/ScoreBreakdown";
 import ArcadeNameEntry from "@/components/ArcadeNameEntry";
 import LeaderboardDialog from "@/components/LeaderboardDialog";
@@ -222,7 +223,7 @@ export default function Game() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground p-4">
+    <div className="min-h-screen flex flex-col bg-background text-foreground p-4" data-game-container>
       {/* Header */}
       <header className="mb-4">
         <div className="flex items-center justify-between mb-2">
