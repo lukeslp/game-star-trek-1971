@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GameEngine } from "@/lib/gameEngine";
 import { CommandProcessor } from "@/lib/commandProcessor";
 import { EntityType } from "@/types/game";
 import { useTour } from "@/hooks/useTour";
-import { HelpCircle, Trophy } from "lucide-react";
+import { HelpCircle, Trophy, Volume2, VolumeX } from "lucide-react";
+import { audioEngine } from "@/lib/audioEngine";
 import ScoreBreakdown from "@/components/ScoreBreakdown";
 import ArcadeNameEntry from "@/components/ArcadeNameEntry";
 import LeaderboardDialog from "@/components/LeaderboardDialog";
@@ -36,9 +37,18 @@ export default function Game() {
   const [gameScore, setGameScore] = useState<GameScore | null>(null);
   const [showNameEntry, setShowNameEntry] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const consoleRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { hasSeenTour, startTour} = useTour();
+
+  // Toggle sound
+  const toggleSound = useCallback(() => {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    audioEngine.setEnabled(newState);
+    if (newState) audioEngine.playClick();
+  }, [soundEnabled]);
 
   const state = engine.getState();
   const currentQuadrant = engine.getCurrentQuadrant();
@@ -59,6 +69,38 @@ export default function Game() {
       return () => clearTimeout(tourTimer);
     }
   }, [hasSeenTour, startTour]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger when typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      // Don't trigger if game over or awaiting input
+      if (state.gameOver || processor.isAwaitingInput()) return;
+
+      const shortcuts: Record<string, () => void> = {
+        'n': () => { audioEngine.playClick(); handleCommandClick('NAV'); },
+        's': () => { audioEngine.playClick(); handleCommandClick('SRS'); },
+        'l': () => { audioEngine.playClick(); handleCommandClick('LRS'); },
+        'p': () => { audioEngine.playClick(); handleCommandClick('PHA'); },
+        't': () => { audioEngine.playClick(); handleCommandClick('TOR'); },
+        'h': () => { audioEngine.playClick(); handleCommandClick('HELP'); },
+        'd': () => { audioEngine.playClick(); handleCommandClick('DAM'); },
+        'c': () => { audioEngine.playClick(); handleCommandClick('COM'); },
+        'm': () => toggleSound(),
+        '?': () => { audioEngine.playClick(); handleCommandClick('HELP'); },
+      };
+
+      const handler = shortcuts[e.key.toLowerCase()];
+      if (handler) {
+        e.preventDefault();
+        handler();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [state.gameOver, processor, toggleSound]);
 
   useEffect(() => {
     // Auto-scroll console to bottom
@@ -177,13 +219,24 @@ export default function Game() {
           </h1>
           <div className="flex-1 flex items-center justify-end gap-2">
             <Button
+              onClick={toggleSound}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-primary"
+              title={soundEnabled ? "Mute sound (M)" : "Enable sound (M)"}
+              aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
+            >
+              {soundEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+            </Button>
+            <Button
               onClick={startTour}
               variant="ghost"
               size="sm"
               className="text-muted-foreground hover:text-primary"
-              title="Take the tour"
+              title="Take the tour (H)"
+              aria-label="Take the interactive tour"
             >
-              <HelpCircle className="w-6 h-6" />
+              <HelpCircle className="w-6 h-6" aria-hidden="true" />
             </Button>
             <Button
               onClick={() => setShowLeaderboard(true)}
@@ -191,8 +244,9 @@ export default function Game() {
               size="sm"
               className="text-muted-foreground hover:text-primary"
               title="View leaderboard"
+              aria-label="View high scores leaderboard"
             >
-              <Trophy className="w-6 h-6" />
+              <Trophy className="w-6 h-6" aria-hidden="true" />
             </Button>
           </div>
         </div>
@@ -331,74 +385,83 @@ export default function Game() {
             <h2 className="text-lg font-bold text-primary mb-3 uppercase tracking-wider">Commands</h2>
             <div className="grid grid-cols-2 gap-2">
               <Button
-                onClick={() => { setCommand("NAV"); handleCommandClick("NAV"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("NAV"); handleCommandClick("NAV"); }}
                 variant="outline"
                 className={BUTTON_STYLES.primary}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Navigate (N)"
               >
                 NAV
               </Button>
               <Button
-                onClick={() => { setCommand("SRS"); handleCommandClick("SRS"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("SRS"); handleCommandClick("SRS"); }}
                 variant="outline"
                 className={BUTTON_STYLES.primary}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Short Range Scan (S)"
               >
                 SRS
               </Button>
               <Button
-                onClick={() => { setCommand("LRS"); handleCommandClick("LRS"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("LRS"); handleCommandClick("LRS"); }}
                 variant="outline"
                 className={BUTTON_STYLES.primary}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Long Range Scan (L)"
               >
                 LRS
               </Button>
               <Button
-                onClick={() => { setCommand("PHA"); handleCommandClick("PHA"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("PHA"); handleCommandClick("PHA"); }}
                 variant="outline"
                 className={BUTTON_STYLES.destructive}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Fire Phasers (P)"
               >
                 PHA
               </Button>
               <Button
-                onClick={() => { setCommand("TOR"); handleCommandClick("TOR"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("TOR"); handleCommandClick("TOR"); }}
                 variant="outline"
                 className={BUTTON_STYLES.destructive}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Fire Torpedoes (T)"
               >
                 TOR
               </Button>
               <Button
-                onClick={() => { setCommand("SHE"); handleCommandClick("SHE"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("SHE"); handleCommandClick("SHE"); }}
                 variant="outline"
                 className={BUTTON_STYLES.secondary}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Shields"
               >
                 SHE
               </Button>
               <Button
-                onClick={() => { setCommand("DAM"); handleCommandClick("DAM"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("DAM"); handleCommandClick("DAM"); }}
                 variant="outline"
                 className={BUTTON_STYLES.accent}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Damage Report (D)"
               >
                 DAM
               </Button>
               <Button
-                onClick={() => { setCommand("COM"); handleCommandClick("COM"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("COM"); handleCommandClick("COM"); }}
                 variant="outline"
                 className={BUTTON_STYLES.accent}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Computer (C)"
               >
                 COM
               </Button>
               <Button
-                onClick={() => { setCommand("HELP"); handleCommandClick("HELP"); }}
+                onClick={() => { audioEngine.playClick(); setCommand("HELP"); handleCommandClick("HELP"); }}
                 variant="outline"
                 className={BUTTON_STYLES.muted}
                 disabled={state.gameOver || processor.isAwaitingInput()}
+                title="Help (H or ?)"
               >
                 HELP
               </Button>
