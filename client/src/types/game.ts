@@ -59,6 +59,14 @@ export interface Ship {
   docked: boolean;
 }
 
+// Message types for color coding
+export type MessageType = 'normal' | 'success' | 'warning' | 'error' | 'info';
+
+export interface GameMessage {
+  text: string;
+  type: MessageType;
+}
+
 export interface GameState {
   galaxy: Quadrant[][];
   currentQuadrant: QuadrantCoords;
@@ -71,7 +79,7 @@ export interface GameState {
   stardatesRemaining: number;
   gameOver: boolean;
   victory: boolean;
-  messages: string[];
+  messages: GameMessage[];
 }
 
 export interface GameConfig {

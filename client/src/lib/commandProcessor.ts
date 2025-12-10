@@ -86,7 +86,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.navigation < 0.5) {
-      this.engine.addMessage("Navigation is damaged!");
+      this.engine.addMessage("Navigation is damaged!", "warning");
       return;
     }
 
@@ -118,7 +118,7 @@ export class CommandProcessor {
     const energyCost = Math.floor(warp * 8);
 
     if (state.ship.energy < energyCost) {
-      this.engine.addMessage("Insufficient energy! Need " + energyCost + ", have " + state.ship.energy);
+      this.engine.addMessage("Insufficient energy! Need " + energyCost + ", have " + state.ship.energy, "error");
       return;
     }
 
@@ -155,7 +155,7 @@ export class CommandProcessor {
 
     // Check galaxy boundaries
     if (newQx < 0 || newQx >= 8 || newQy < 0 || newQy >= 8) {
-      this.engine.addMessage("You cannot leave the galaxy!");
+      this.engine.addMessage("You cannot leave the galaxy!", "warning");
       return;
     }
 
@@ -166,7 +166,7 @@ export class CommandProcessor {
     );
 
     if (collision) {
-      this.engine.addMessage("Collision detected! Navigation aborted.");
+      this.engine.addMessage("Collision detected! Navigation aborted.", "warning");
       return;
     }
 
@@ -193,7 +193,7 @@ export class CommandProcessor {
       position: { sx: newSx, sy: newSy },
     });
 
-    this.engine.addMessage("Warp engines engaged.");
+    this.engine.addMessage("Warp engines engaged.", "info");
     this.engine.advanceStardate(1);
     this.engine.checkDocked();
     
@@ -208,7 +208,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.shortRangeSensors < 0.5) {
-      this.engine.addMessage("Short range sensors are damaged!");
+      this.engine.addMessage("Short range sensors are damaged!", "warning");
       return;
     }
 
@@ -259,7 +259,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.longRangeSensors < 0.5) {
-      this.engine.addMessage("Long range sensors are damaged!");
+      this.engine.addMessage("Long range sensors are damaged!", "warning");
       return;
     }
 
@@ -294,7 +294,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.phasers < 0.5) {
-      this.engine.addMessage("Phasers are damaged!");
+      this.engine.addMessage("Phasers are damaged!", "warning");
       return;
     }
 
@@ -332,7 +332,7 @@ export class CommandProcessor {
     const energyPerKlingon = energy / klingons.length;
 
     this.engine.addMessage("");
-    this.engine.addMessage("Phasers fired!");
+    this.engine.addMessage("Phasers fired!", "info");
     
     klingons.forEach(klingon => {
       const dx = klingon.position.sx - state.currentSector.sx;
@@ -342,10 +342,10 @@ export class CommandProcessor {
 
       if (klingon.energy) {
         klingon.energy -= damage;
-        this.engine.addMessage("Hit Klingon at " + (klingon.position.sx + 1) + "," + (klingon.position.sy + 1) + " for " + damage + " damage");
+        this.engine.addMessage("Hit Klingon at " + (klingon.position.sx + 1) + "," + (klingon.position.sy + 1) + " for " + damage + " damage", "warning");
 
         if (klingon.energy <= 0) {
-          this.engine.addMessage("*** KLINGON DESTROYED ***");
+          this.engine.addMessage("*** KLINGON DESTROYED ***", "success");
           this.engine.removeEntity(klingon);
           quadrant.klingons--;
           state.klingonsRemaining--;
@@ -363,12 +363,12 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.torpedoes < 0.5) {
-      this.engine.addMessage("Torpedo tubes are damaged!");
+      this.engine.addMessage("Torpedo tubes are damaged!", "warning");
       return;
     }
 
     if (state.ship.torpedoes <= 0) {
-      this.engine.addMessage("No torpedoes remaining!");
+      this.engine.addMessage("No torpedoes remaining!", "error");
       return;
     }
 
@@ -417,20 +417,20 @@ export class CommandProcessor {
       }
 
       const target = this.engine.getEntity({ sx, sy });
-      
+
       if (target) {
         if (target.type === EntityType.KLINGON) {
-          this.engine.addMessage("*** KLINGON DESTROYED ***");
+          this.engine.addMessage("*** KLINGON DESTROYED ***", "success");
           this.engine.removeEntity(target);
           quadrant.klingons--;
           state.klingonsRemaining--;
           break;
         } else if (target.type === EntityType.STAR) {
-          this.engine.addMessage("Torpedo absorbed by star");
+          this.engine.addMessage("Torpedo absorbed by star", "warning");
           break;
         } else if (target.type === EntityType.STARBASE) {
-          this.engine.addMessage("*** STARBASE DESTROYED ***");
-          this.engine.addMessage("You have destroyed a Federation starbase!");
+          this.engine.addMessage("*** STARBASE DESTROYED ***", "error");
+          this.engine.addMessage("You have destroyed a Federation starbase!", "error");
           this.engine.removeEntity(target);
           quadrant.starbases--;
           break;
@@ -448,7 +448,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.shields < 0.5) {
-      this.engine.addMessage("Shield control is damaged!");
+      this.engine.addMessage("Shield control is damaged!", "warning");
       return;
     }
 
@@ -471,12 +471,12 @@ export class CommandProcessor {
       }
 
       if (amount > 0 && amount > state.ship.energy) {
-        this.engine.addMessage("Insufficient energy!");
+        this.engine.addMessage("Insufficient energy!", "error");
         return;
       }
 
       if (amount < 0 && Math.abs(amount) > state.ship.shields) {
-        this.engine.addMessage("Insufficient shield energy!");
+        this.engine.addMessage("Insufficient shield energy!", "error");
         return;
       }
 
@@ -484,8 +484,8 @@ export class CommandProcessor {
       state.ship.shields += amount;
       state.ship.shieldsUp = state.ship.shields > 0;
 
-      this.engine.addMessage("Shield energy now: " + state.ship.shields);
-      this.engine.addMessage("Ship energy now: " + state.ship.energy);
+      this.engine.addMessage("Shield energy now: " + state.ship.shields, "info");
+      this.engine.addMessage("Ship energy now: " + state.ship.energy, "info");
     };
   }
 
@@ -514,7 +514,7 @@ export class CommandProcessor {
     const state = this.engine.getState();
     
     if (state.ship.damage.computer < 0.5) {
-      this.engine.addMessage("Computer is damaged!");
+      this.engine.addMessage("Computer is damaged!", "warning");
       return;
     }
 
@@ -600,7 +600,7 @@ export class CommandProcessor {
     if (klingons.length === 0) return;
 
     this.engine.addMessage("");
-    this.engine.addMessage("Klingons attack!");
+    this.engine.addMessage("Klingons attack!", "error");
 
     klingons.forEach(klingon => {
       if (!klingon.energy) return;
@@ -612,23 +612,23 @@ export class CommandProcessor {
 
       if (state.ship.shieldsUp && state.ship.shields > 0) {
         state.ship.shields -= damage;
-        this.engine.addMessage("Shields hit for " + damage + " damage. Shields now at " + Math.max(0, state.ship.shields));
-        
+        this.engine.addMessage("Shields hit for " + damage + " damage. Shields now at " + Math.max(0, state.ship.shields), "warning");
+
         if (state.ship.shields <= 0) {
           state.ship.shields = 0;
           state.ship.shieldsUp = false;
-          this.engine.addMessage("*** SHIELDS DOWN ***");
+          this.engine.addMessage("*** SHIELDS DOWN ***", "error");
         }
       } else {
         state.ship.energy -= damage;
-        this.engine.addMessage("Hull hit for " + damage + " damage!");
-        
+        this.engine.addMessage("Hull hit for " + damage + " damage!", "error");
+
         // Random system damage
         if (Math.random() < 0.3) {
           const systems = Object.keys(state.ship.damage) as (keyof typeof state.ship.damage)[];
           const system = systems[Math.floor(Math.random() * systems.length)];
           state.ship.damage[system] = Math.max(0, state.ship.damage[system] - 0.2);
-          this.engine.addMessage(system + " damaged!");
+          this.engine.addMessage(system + " damaged!", "error");
         }
       }
     });

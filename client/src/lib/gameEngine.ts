@@ -7,6 +7,7 @@ import {
   QuadrantCoords,
   SectorCoords,
   Entity,
+  MessageType,
 } from "@/types/game";
 
 export class GameEngine {
@@ -59,20 +60,20 @@ export class GameEngine {
       gameOver: false,
       victory: false,
       messages: [
-        "=== STAR TREK ===",
-        "",
-        "Stardate " + this.config.initialStardate,
-        "",
-        "Your orders are as follows:",
-        "  Destroy the " + this.config.initialKlingons + " Klingon warships which have invaded",
-        "  the galaxy before they can attack Federation Headquarters",
-        "  on stardate " + (this.config.initialStardate + this.config.initialStardates) + ".",
-        "  This gives you " + this.config.initialStardates + " days.",
-        "",
-        "There are " + this.config.initialStarbases + " starbases in the galaxy for resupply.",
-        "",
-        "Type HELP for a list of commands.",
-        "",
+        { text: "=== STAR TREK ===", type: "info" },
+        { text: "", type: "normal" },
+        { text: "Stardate " + this.config.initialStardate, type: "normal" },
+        { text: "", type: "normal" },
+        { text: "Your orders are as follows:", type: "normal" },
+        { text: "  Destroy the " + this.config.initialKlingons + " Klingon warships which have invaded", type: "warning" },
+        { text: "  the galaxy before they can attack Federation Headquarters", type: "warning" },
+        { text: "  on stardate " + (this.config.initialStardate + this.config.initialStardates) + ".", type: "warning" },
+        { text: "  This gives you " + this.config.initialStardates + " days.", type: "normal" },
+        { text: "", type: "normal" },
+        { text: "There are " + this.config.initialStarbases + " starbases in the galaxy for resupply.", type: "info" },
+        { text: "", type: "normal" },
+        { text: "Type HELP for a list of commands.", type: "info" },
+        { text: "", type: "normal" },
       ],
     };
   }
@@ -209,8 +210,8 @@ export class GameEngine {
     return this.state;
   }
 
-  public addMessage(message: string): void {
-    this.state.messages.push(message);
+  public addMessage(message: string, type: MessageType = 'normal'): void {
+    this.state.messages.push({ text: message, type });
   }
 
   public advanceStardate(amount: number): void {
@@ -223,8 +224,8 @@ export class GameEngine {
     if (this.state.stardatesRemaining <= 0 && this.state.klingonsRemaining > 0) {
       this.state.gameOver = true;
       this.addMessage("");
-      this.addMessage("*** TIME'S UP! ***");
-      this.addMessage("The Federation has been conquered by the Klingons.");
+      this.addMessage("*** TIME'S UP! ***", "error");
+      this.addMessage("The Federation has been conquered by the Klingons.", "error");
       this.addMessage("You destroyed " + (this.state.initialKlingons - this.state.klingonsRemaining) + " of " + this.state.initialKlingons + " Klingons.");
     }
   }
@@ -255,7 +256,7 @@ export class GameEngine {
     this.state.ship.docked = !!starbase;
     
     if (this.state.ship.docked && !this.state.gameOver) {
-      this.addMessage("Docked at starbase. Shields dropped.");
+      this.addMessage("Docked at starbase. Shields dropped.", "success");
       this.state.ship.shieldsUp = false;
       this.refuelAtStarbase();
     }
@@ -276,7 +277,7 @@ export class GameEngine {
     });
     
     if (energyGained > 0 || torpedoesGained > 0) {
-      this.addMessage("Energy and torpedoes replenished. All systems repaired.");
+      this.addMessage("Energy and torpedoes replenished. All systems repaired.", "success");
     }
   }
 
@@ -285,11 +286,11 @@ export class GameEngine {
       this.state.gameOver = true;
       this.state.victory = true;
       this.addMessage("");
-      this.addMessage("*** CONGRATULATIONS! ***");
-      this.addMessage("The last Klingon battle cruiser has been destroyed.");
-      this.addMessage("The Federation has been saved!");
+      this.addMessage("*** CONGRATULATIONS! ***", "success");
+      this.addMessage("The last Klingon battle cruiser has been destroyed.", "success");
+      this.addMessage("The Federation has been saved!", "success");
       this.addMessage("");
-      this.addMessage("Your efficiency rating: " + this.calculateRating());
+      this.addMessage("Your efficiency rating: " + this.calculateRating(), "info");
     }
   }
 
@@ -308,8 +309,8 @@ export class GameEngine {
     if (this.state.ship.energy <= 0) {
       this.state.gameOver = true;
       this.addMessage("");
-      this.addMessage("*** ENTERPRISE DESTROYED ***");
-      this.addMessage("You have been defeated by the Klingons.");
+      this.addMessage("*** ENTERPRISE DESTROYED ***", "error");
+      this.addMessage("You have been defeated by the Klingons.", "error");
     }
   }
 

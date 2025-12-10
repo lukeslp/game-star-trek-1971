@@ -24,6 +24,31 @@ export interface ScoreItem {
 }
 
 /**
+ * Calculate live score during gameplay (in progress, not final)
+ * This shows real-time score as player progresses
+ */
+export function calculateLiveScore(state: GameState): number {
+  // Klingons destroyed so far: 100 points each
+  const klingonsKilled = state.initialKlingons - state.klingonsRemaining;
+  const klingonScore = klingonsKilled * 100;
+
+  // Energy efficiency bonus (current energy vs starting)
+  const energyEfficiency = Math.floor(state.ship.energy / 100);
+
+  // Torpedoes remaining: 50 points each
+  const torpedoScore = state.ship.torpedoes * 50;
+
+  // Time efficiency (stardates remaining)
+  const timeScore = Math.floor(state.stardatesRemaining * 10);
+
+  // No damage bonus check (all systems at full health)
+  const allSystemsHealthy = Object.values(state.ship.damage).every(d => d === 1);
+  const damageBonus = allSystemsHealthy ? 500 : 0;
+
+  return klingonScore + energyEfficiency + torpedoScore + timeScore + damageBonus;
+}
+
+/**
  * Calculate final score from game state
  */
 export function calculateScore(state: GameState): GameScore {

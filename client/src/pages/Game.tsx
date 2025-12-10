@@ -12,6 +12,7 @@ import ArcadeNameEntry from "@/components/ArcadeNameEntry";
 import LeaderboardDialog from "@/components/LeaderboardDialog";
 import {
   calculateScore,
+  calculateLiveScore,
   isHighScore,
   saveHighScore,
   getLastPlayerName,
@@ -254,7 +255,7 @@ export default function Game() {
       </header>
 
       {/* Status Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 mb-4" data-tour="status-bar">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-4" data-tour="status-bar">
         <div className="status-panel">
           <div className="status-item">
             <span className="status-label">Stardate</span>
@@ -298,6 +299,14 @@ export default function Game() {
             <span className="status-label">Klingons</span>
             <span className={`status-value ${state.klingonsRemaining > 0 ? 'text-destructive' : 'text-primary'}`}>
               {state.klingonsRemaining}
+            </span>
+          </div>
+        </div>
+        <div className="status-panel">
+          <div className="status-item">
+            <span className="status-label">Score</span>
+            <span className="status-value text-secondary" style={{ textShadow: "0 0 5px currentColor" }}>
+              {calculateLiveScore(state).toLocaleString()}
             </span>
           </div>
         </div>
@@ -370,11 +379,21 @@ export default function Game() {
               ref={consoleRef}
               className="console-output flex-1 min-h-[300px] max-h-[500px]"
             >
-              {state.messages.map((msg, i) => (
-                <div key={i} className="leading-relaxed">
-                  {msg}
-                </div>
-              ))}
+              {state.messages.map((msg, i) => {
+                const colorClass = {
+                  normal: 'text-foreground',
+                  success: 'text-primary font-semibold',
+                  warning: 'text-yellow-400',
+                  error: 'text-destructive font-semibold',
+                  info: 'text-secondary',
+                }[msg.type];
+
+                return (
+                  <div key={i} className={`leading-relaxed ${colorClass}`}>
+                    {msg.text}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
