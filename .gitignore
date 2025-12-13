@@ -104,3 +104,11 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# AI Development Tools (do not publish)
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.gemini/
+*.mdc
