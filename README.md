@@ -1,5 +1,9 @@
 # Star Trek 1971
 
+![React](https://img.shields.io/badge/react-18.0%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-success)
+
 A faithful recreation of the classic 1971 text-based Star Trek game with a modern React-based interface.
 
 ## About
@@ -124,6 +128,6 @@ MIT
 ## Author
 
 **Luke Steuber**
-- Website: [lukesteuber.com](https://lukesteuber.com)
+- Website: [dr.eamer.dev](https://dr.eamer.dev)
 - GitHub: [@lukeslp](https://github.com/lukeslp)
-- Bluesky: [@lukesteuber.com](https://bsky.app/profile/lukesteuber.com)
+- Bluesky: [@dr.eamer.dev](https://bsky.app/profile/dr.eamer.dev)
