@@ -8,8 +8,6 @@ A faithful recreation of the classic 1971 text-based Star Trek game with a moder
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://dr.eamer.dev/games/star-trek/)
 
-![Star Trek 1971 gameplay](https://raw.githubusercontent.com/lukeslp/game-star-trek-1971/main/screenshot.png)
-
 ## About
 
 Command the USS Enterprise in this historic space strategy game. Navigate through quadrants, battle Klingon warships, dock at starbases for repairs, and complete your mission before time runs out.
