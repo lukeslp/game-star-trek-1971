@@ -26,10 +26,6 @@ The original Star Trek game was created in 1971 by Mike Mayfield and became one 
 - Retro terminal aesthetic with modern React UI
 - Interactive tour for new players
 
-## Screenshot
-
-*Command interface with galaxy map, sector scan, and console log*
-
 ## Getting Started
 
 ### Prerequisites
@@ -133,3 +129,4 @@ MIT
 - Website: [dr.eamer.dev](https://dr.eamer.dev)
 - GitHub: [@lukeslp](https://github.com/lukeslp)
 - Bluesky: [@dr.eamer.dev](https://bsky.app/profile/dr.eamer.dev)
+
