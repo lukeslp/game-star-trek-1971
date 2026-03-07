@@ -4,120 +4,75 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-active-success)
 
-A faithful recreation of the classic 1971 text-based Star Trek game with a modern React-based interface.
+The 1971 Star Trek text game, rebuilt in React. Same brutal gameplay, better looking terminal.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://dr.eamer.dev/games/star-trek/)
 
-## About
+## What is this?
 
-Command the USS Enterprise in this historic space strategy game. Navigate through quadrants, battle Klingon warships, dock at starbases for repairs, and complete your mission before time runs out.
+Mike Mayfield wrote the original Star Trek game in 1971 and it became one of the most ported games in computing history. You command the Enterprise, hunt Klingons across an 8x8 galaxy, dock at starbases when you're falling apart, and try to finish before the clock runs out.
 
-The original Star Trek game was created in 1971 by Mike Mayfield and became one of the most influential early computer games. This version preserves the core gameplay while reimagining it with modern UI/UX.
+This version keeps the original mechanics intact — the galaxy layout, energy management, torpedo physics, all of it — but swaps the teletype interface for a React UI with a retro terminal look. There's also an interactive tour if you've never played the original.
 
-## Features
-
-- Classic 1971 gameplay mechanics
-- 8x8 galaxy grid with quadrant navigation
-- Klingon combat system
-- Starbase docking and repairs
-- Phaser and photon torpedo weapons
-- Long-range and short-range sensors
-- Energy and shield management
-- Retro terminal aesthetic with modern React UI
-- Interactive tour for new players
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm (or npm)
-
-### Installation
+## Running it
 
 ```bash
 pnpm install
+pnpm dev          # localhost:3000
 ```
 
-### Development
+Production: `pnpm build && pnpm start`
 
-```bash
-pnpm dev
-```
+Needs Node 18+.
 
-Opens at `http://localhost:3000`
+## How it plays
 
-### Production Build
-
-```bash
-pnpm build
-pnpm start
-```
-
-## How to Play
-
-1. View your mission briefing
-2. Use commands to navigate, scan, and engage enemies
-3. Destroy all Klingon ships before the stardate expires
+You get a mission briefing with a Klingon count and a stardate deadline. Navigate quadrants, scan for enemies, and blow them up before time expires. Dock at starbases to recharge and repair.
 
 ### Commands
 
-| Command | Action |
-|---------|--------|
+| Command | What it does |
+|---------|--------------|
 | NAV | Warp to another quadrant |
-| SRS | Short-range scan (current sector) |
-| LRS | Long-range scan (surrounding quadrants) |
-| PHA | Fire phasers |
-| TOR | Fire photon torpedo |
-| SHE | Adjust shields |
+| SRS | Short-range scan (your current sector) |
+| LRS | Long-range scan (neighboring quadrants) |
+| PHA | Fire phasers — always hits, weaker at distance |
+| TOR | Fire photon torpedo — limited ammo, aimed by course heading |
+| SHE | Redistribute energy to shields |
 | DAM | Damage report |
 | COM | Ship computer |
 
-### Victory Conditions
+### Combat
 
-- **Win**: Destroy all Klingon ships within the time limit
-- **Lose**: Enterprise is destroyed or time expires
+Phasers are reliable but lose punch over distance. Torpedoes hit hard but you've got a limited supply and need to aim them. Shields soak damage but cost energy. Klingons shoot back every turn, so standing still in a hostile quadrant is a bad plan.
 
-## Game Mechanics
+### Energy
 
-### Energy Management
-- Warp drive consumes energy based on distance
-- Phasers draw from ship's power
-- Shields reduce damage but can be transferred energy
-- Dock at starbases to recharge
+Everything costs energy — warping, shooting phasers, running shields. Starbases are the only way to recharge. If you burn through your reserves in deep space, you're done.
 
-### Combat System
-- **Phasers**: Guaranteed hit, damage decreases with distance
-- **Torpedoes**: Limited supply, must aim using course direction
-- **Shields**: Absorb damage
-- Klingons return fire each turn
+### The galaxy
 
-### Quadrant System
-- Galaxy divided into 8x8 grid of quadrants
-- Each quadrant contains 8x8 sectors
-- Stars are navigation hazards
-- Starbases provide sanctuary and repairs
+64 quadrants in an 8x8 grid. Each quadrant has 64 sectors. Stars block movement. Starbases are safe harbors. Klingons are everywhere else.
 
-## Tech Stack
+### Win/lose
 
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS 4
-- Express (production server)
-- wouter (routing)
+Destroy every Klingon before the stardate deadline. If the Enterprise blows up or time runs out, game over.
 
-## Tips
+## Practical advice
 
-- Prioritize Klingon destruction over exploration
-- Keep shields up in combat zones
-- Conserve torpedoes for crucial moments
-- Use starbases strategically for repairs
-- Monitor energy levels constantly
+- Kill Klingons first, explore later
+- Shields up before entering hostile quadrants
+- Save torpedoes for when they matter
+- Keep an eye on energy — running dry is how most games end
+- Starbases fix everything, use them
+
+## Stack
+
+React 18, TypeScript, Vite, Tailwind CSS 4, Express (production server), wouter (routing).
 
 ## Credits
 
-Original game concept: Mike Mayfield (1971)
+Original game: Mike Mayfield (1971)
 
 ## License
 
@@ -125,8 +80,4 @@ MIT
 
 ## Author
 
-**Luke Steuber**
-- Website: [dr.eamer.dev](https://dr.eamer.dev)
-- GitHub: [@lukeslp](https://github.com/lukeslp)
-- Bluesky: [@dr.eamer.dev](https://bsky.app/profile/dr.eamer.dev)
-
+**Luke Steuber** — [dr.eamer.dev](https://dr.eamer.dev) · [GitHub](https://github.com/lukeslp) · [Bluesky](https://bsky.app/profile/dr.eamer.dev)
