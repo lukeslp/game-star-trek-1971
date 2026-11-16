@@ -150,7 +150,6 @@ Each variant has unique:
 /variants/
   index.html              # Variant selector
   README.md               # This file
-  VARIANTS_PLAN.md        # Design document
   
   brutalist/
     index.html            # Self-contained variant
